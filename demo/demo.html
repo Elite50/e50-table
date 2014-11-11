@@ -1,0 +1,42 @@
+<!doctype html>
+<html ng-app="demo">
+  <head>
+    <meta charset="utf-8">
+    <title>Elite50 AngularJS Table Directive Demo</title>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.18/angular.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.18/angular-resource.js"></script>
+
+    <link rel="stylesheet" href="demo.css">
+  </head>
+  <body ng-controller="demoCtrl">
+    <div>
+      <h1>Demo</h1>
+
+      <table e50-table e50-use="hi,bye" e50-row-hover e50-data="people" e50-fetch="http://loc.cs-back.com/testing/:num"
+        e50-fetch-method="GET" e50-fetch-params="{num:5}" e50-poll="5000">
+        <thead>
+          <tr>
+            <td>Name</td>
+            <td>Address</td>
+            <td>Actions</td>
+            <td>Actions</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-click="hi()">
+            <td ng-bind="name"></td>
+            <td ng-bind="address"></td>
+            <td ng-bind="actions"></td>
+            <td><a e50-no-prop ng-click="bye()">Bye</a></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <pre>{{ people }}</pre>
+    </div>
+
+    <script src="../dist/e50-table.min.js"></script>
+    <script src="demo.js"></script>
+  </body>
+</html>

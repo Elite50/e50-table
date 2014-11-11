@@ -1,0 +1,19 @@
+{
+  "name": "e50-table",
+  "version": "0.0.1",
+  "authors": [
+    "Will Durney <wdurney@wesleyan.edu>"
+  ],
+  "description": "Elite50 AngularJS Table Directive",
+  "main": "dist/e50-table.js",
+  "license": "MIT",
+  "private": false,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ],
+  "devDependencies": {
+    "angular": "~1.2.26"
+  }
+}

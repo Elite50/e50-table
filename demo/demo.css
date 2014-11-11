@@ -1,0 +1,11 @@
+table {
+  border: 1px solid blue;
+}
+
+td {
+  border: 1px solid green;
+}
+
+tr.hover {
+  background-color: pink;
+}

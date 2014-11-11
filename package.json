@@ -1,0 +1,22 @@
+{
+  "name": "e50-table",
+  "version": "0.0.1",
+  "description": "Elite50 AngularJS Table Directive",
+  "repository": "GITHUB REPOSITORY",
+  "main": "dist/e50-table.js",
+  "keywords": [
+    "angularjs",
+    "angular",
+    "directive"
+  ],
+  "author": "Elite50",
+  "license": "MIT",
+  "devDependencies": {
+    "grunt": "latest",
+    "grunt-contrib-concat": "^0.5.0",
+    "grunt-contrib-jshint": "latest",
+    "grunt-contrib-nodeunit": "latest",
+    "grunt-ng-annotate": "latest",
+    "grunt-contrib-uglify": "latest"
+  }
+}

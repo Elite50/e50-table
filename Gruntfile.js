@@ -5,7 +5,7 @@ module.exports = function(grunt) {
     ngAnnotate: {
       build: {
         files: {
-          'dist/<%= pkg.name %>.js': ['src/app.js', 'src/directives/e50-table.js', 'src/services/Poll.js']
+          'dist/<%= pkg.name %>.js': ['src/**/*.js']
         }
       }
     },
@@ -19,10 +19,27 @@ module.exports = function(grunt) {
         dest: 'dist/<%= pkg.name %>.min.js',
       }
     },
+    watch: {
+      build: {
+        options: {
+          livereload: 2342
+        },
+        files: ['demo/*.css', 'src/**/*.js', 'demo/*.html', 'demo/*.js', 'Gruntfile.js']
+      }
+    }
   });
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-ng-annotate');
 
-  grunt.registerTask('default', ['ngAnnotate','uglify']);
+  grunt.registerTask('default', [
+    'ngAnnotate',
+    'uglify'
+  ]);
+
+  grunt.registerTask('default:watch', [
+    'default',
+    'watch'
+  ]);
 };

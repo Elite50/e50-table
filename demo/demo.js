@@ -5,12 +5,14 @@ angular.module('demo').controller('demoCtrl', function($scope) {
     {
       id: 1,
       name: 'John Doe',
-      address: '815 Ocean Drive'
+      address: '815 Ocean Drive',
+      actions: 14
     },
     {
       id: 2,
       name: 'Jane Doe',
-      address: '42 Hatch Road'
+      address: '42 Hatch Road',
+      actions: 51
     }
   ];
 

@@ -11,26 +11,58 @@
   </head>
   <body ng-controller="demoCtrl">
     <div>
-      <h1>Demo</h1>
+      <h1>Elite50 Table Directive Demo</h1>
 
-      <table e50-table e50-use="hi,bye" e50-row-hover e50-data="people">
-        <thead>
-          <tr>
-            <th>Claim</th>
-            <th>Address</th>
-            <th>Count</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr ng-click="hi()">
+      <h2>Fetching data from server:</h2>
+
+      <p>
+        Polling every 2 seconds. Number of entries to fetch:
+        <input type="number" ng-model="num"/>
+      </p>
+
+      <div>
+        <table e50-table e50-fetch="http://loc.cs-back.com/testing/:num"
+          e50-fetch-params="{num:num}" e50-poll="2000">
+          <tr e50-table-row ng-click="hi()">
             <td ng-bind="name"></td>
             <td ng-bind="address"></td>
             <td ng-bind="count"></td>
             <td><a e50-no-prop ng-click="bye()">Bye</a></td>
           </tr>
-        </tbody>
-      </table>
+        </table>
+      </div>
+
+      <h2>Data manipulated by controller:</h2>
+
+      <p>
+        Changed every 3 seconds. Sorting on <em>count</em>.
+        Click to toggle sort order:
+        <a href="" ng-click="toggleSort()" ng-bind="sort.toUpperCase()"></a>
+      </p>
+
+      <div ng-if="!people.length">No People</div>
+
+      <div ng-if="people.length">
+        <table e50-table e50-use="clickRow,clickLink" e50-data="people"
+          e50-sort="count" e50-sort-order="{{sort}}">
+          <thead>
+            <tr>
+              <th>Claim</th>
+              <th>Address</th>
+              <th>Count</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr e50-table-row e50-hover ng-click="clickRow()">
+              <td ng-bind="name"></td>
+              <td ng-bind="address"></td>
+              <td ng-bind="count"></td>
+              <td><a href="" e50-no-prop ng-click="clickLink()">Bye</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <script src="http://localhost:2342/livereload.js"></script>

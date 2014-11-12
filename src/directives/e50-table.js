@@ -1,31 +1,59 @@
-angular.module('e50Table').directive('e50Table', function ($interval, Poll, $parse, $compile, $resource) {
+angular.module('e50Table').directive('e50Table', function ($parse, $compile) {
   return {
     restrict: 'A',
     scope: {
       data: '=?e50Data',
-      use: '@e50Use',
-      rowHover: '@e50RowHover',
-      fetch: '@e50Fetch',
       fetchParams: '=?e50FetchParams',
-      fetchMethod: '@e50FetchMethod',
       fetchBody: '=?e50FetchBody',
-      poll: '@e50Poll',
       sort: '@e50Sort',
       sortOrder: '@e50SortOrder'
     },
+    controller: function($scope) {
+      this.$scope = $scope;
+    },
     link: function postLink(scope, element, attrs) {
-      var $tbody = element.find('tbody');
-      var $row = $tbody.find('tr');
-      var pScope = {};
+
+      var $row = element[0].querySelector('[e50-table-row]');
+      $row = angular.element($row);
+      var $tbody = $row.parent();
 
       // Add references to 'used' scope variables to simulate closure
-      if (scope.use !== undefined) {
-        scope.use = scope.use.split(scope.use.indexOf(';')>0?';':',');
-        angular.forEach(scope.use, function(ref) {
+      var pScope = {};
+      if ('e50Use' in attrs) {
+        // Split on commas, unless there's a semicolon present
+        var refs = attrs.e50Use.split(attrs.e50Use.indexOf(';')>0?';':',');
+        angular.forEach(refs, function(ref) {
           pScope[ref] = $parse(ref)(scope.$parent);
         });
       }
 
+      // Create the actual row markup
+      function update() {
+        $tbody.empty();
+        var tableData = angular.copy(scope.data);
+        // Optionally sort the data
+        if ('e50Sort' in attrs) {
+          tableData.sort(sort);
+        }
+        // Append and compile each row
+        angular.forEach(tableData, function(d) {
+          var newScope = scope.$new(true);
+          // Add the row data
+          angular.extend(newScope, d);
+          // Add the 'used' data
+          angular.extend(newScope, pScope);
+          var $newRow = $row.clone();
+          $tbody.append($newRow);
+          $compile($newRow)(newScope);
+        });
+      }
+
+      // Watch for changes that require table re-draw
+      scope.$watch('[data, sort, sortOrder]', function() {
+        update();
+      }, true);
+
+      // Sort based on data key and provided order
       function sort(a, b) {
         var order = scope.sortOrder === 'desc' ? 'desc' : 'asc';
         if (a[scope.sort] < b[scope.sort]) {
@@ -37,73 +65,6 @@ angular.module('e50Table').directive('e50Table', function ($interval, Poll, $par
         }
       }
 
-      // Create the actual row markup
-      function update() {
-        $tbody.empty();
-        var tableData = angular.copy(scope.data);
-        // Optionally sort the data
-        if (scope.sort !== undefined) {
-          tableData.sort(sort);
-        }
-        angular.forEach(tableData, function(d) {
-          var newScope = scope.$new(true);
-          angular.extend(newScope, d);
-          angular.extend(newScope, pScope);
-          var compiled = $compile($row.clone())(newScope);
-          // Possibly add hover class for mousing over rows
-          if (typeof attrs.e50RowHover !== 'undefined') {
-            var hoverClass = scope.rowHover.length ? scope.rowHover : 'hover';
-            compiled.on('mouseenter', function() {
-              compiled.addClass(hoverClass);
-            }).on('mouseleave', function() {
-              compiled.removeClass(hoverClass);
-            });
-          }
-          $tbody.append(compiled);
-        });
-        // Prevent click propagation in elems with attr e50-no-prop
-        angular.element(element[0].querySelectorAll('[e50-no-prop]'))
-        .on('click', function(e) {
-          e.stopPropagation();
-        });
-      }
-
-      scope.$watch('data', function() {
-        update();
-      }, true);
-
-      // Watch for changes to data
-      scope.$watchCollection('[sort, sortOrder]', function() {
-        update();
-      });
-
-      // If loading data dynamically
-      if (scope.fetch) {
-        var fetchResource = $resource(scope.fetch, {}, {
-          fetch: { method: scope.fetchMethod !== undefined ? scope.fetchMethod : 'GET' }
-        });
-        var fetch = function() {
-          return fetchResource.fetch(scope.fetchParams, scope.fetchBody).$promise
-            .then(function(response) {
-              scope.data = response.data;
-            });
-        };
-        // Only fetch once if desired
-        if (typeof attrs.e50FetchOnce !== 'undefined') {
-          fetch();
-          // Otherwise, fetch whenever the params change
-        } else {
-          scope.$watchCollection('[fetchParams, fetchBody]', fetch);
-        }
-
-        // Start polling if element has poll attr
-        if (typeof attrs.e50Poll !== 'undefined') {
-          var poll = new Poll(fetch, scope.poll);
-          scope.$on('$destroy', function() {
-            poll.stop();
-          });
-        }
-      }
     }
   };
 });

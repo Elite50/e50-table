@@ -11,4 +11,5 @@ td {
 
 tr.hover {
   background-color: pink;
+  cursor: pointer;
 }

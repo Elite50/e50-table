@@ -1,6 +1,14 @@
 angular.module('demo', ['e50Table']);
 
 angular.module('demo').controller('demoCtrl', function($interval, $scope) {
+
+  $scope.num = 5;
+  $scope.sort = 'asc';
+
+  $scope.toggleSort = function() {
+    $scope.sort = $scope.sort === 'asc' ? 'desc' : 'asc';
+  };
+
   $scope.people = [
     {
       id: 1,
@@ -16,11 +24,11 @@ angular.module('demo').controller('demoCtrl', function($interval, $scope) {
     }
   ];
 
-  $scope.hi = function() {
-    alert('hi');
+  $scope.clickRow = function() {
+    alert('You\'ve clicked a row!');
   };
-  $scope.bye = function() {
-    alert('bye');
+  $scope.clickLink = function() {
+    alert('You\'ve clicked a link!');
   };
 
   var names = [
@@ -29,6 +37,10 @@ angular.module('demo').controller('demoCtrl', function($interval, $scope) {
     'Tim', 'Fred', 'Trisha', 'Lorraine', 'Greta', 'Trish', 'Mary',
     'Margaret', 'Marguerite', 'Mark', 'Marc', 'Jimmy', 'James', 'Fred',
     'Frank', 'Francis', 'Peter', 'Patrick', 'Patricia', 'Pamela'
+  ];
+  var suffs = [
+    'son', 'man', 'berg', 'stein', 'baum', 'brook', 'dale', 'ford',
+    'gate', 'holm', 'ridge', 'smith', 'wood', 'worth'
   ];
   var vs = ['a', 'e', 'i', 'o', 'u'];
   var cs = [
@@ -46,15 +58,15 @@ angular.module('demo').controller('demoCtrl', function($interval, $scope) {
   $interval(function() {
     if ($scope.people.length < 10) {
       var fn = names[rand(names.length)];
-      var ln = names[rand(names.length)] + 'son';
+      var ln = names[rand(names.length)] + suffs[rand(suffs.length)];
       var csl = cs.length; var vsl = vs.length;
       var street = cs[rand(csl)].toUpperCase() + vs[rand(vsl)] + vs[rand(vsl)];
       street += cs[rand(csl)] + vs[rand(vsl)] + cs[rand(csl)];
       $scope.people.push({
         id: $scope.people.length,
         name: fn + ' ' + ln,
-        address: rand(2000) + ' ' + street + ' ' + streets[rand(streets.length)],
-        count: rand(100)
+        address: (rand(2000)+1) + ' ' + street + ' ' + streets[rand(streets.length)],
+        count: rand(100)+1
       });
     } else {
       $scope.people = [];

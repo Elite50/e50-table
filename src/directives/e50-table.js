@@ -1,4 +1,4 @@
-angular.module('e50Table').directive('e50Table', function (Poll, $parse, $compile, $resource) {
+angular.module('e50Table').directive('e50Table', function ($interval, Poll, $parse, $compile, $resource) {
   return {
     restrict: 'A',
     scope: {
@@ -51,7 +51,7 @@ angular.module('e50Table').directive('e50Table', function (Poll, $parse, $compil
           angular.extend(newScope, pScope);
           var compiled = $compile($row.clone())(newScope);
           // Possibly add hover class for mousing over rows
-          if (typeof attrs.rowHover !== 'undefined') {
+          if (typeof attrs.e50RowHover !== 'undefined') {
             var hoverClass = scope.rowHover.length ? scope.rowHover : 'hover';
             compiled.on('mouseenter', function() {
               compiled.addClass(hoverClass);
@@ -61,15 +61,19 @@ angular.module('e50Table').directive('e50Table', function (Poll, $parse, $compil
           }
           $tbody.append(compiled);
         });
-        // Prevent click propagation in elems with attr no-prop
-        angular.element(element[0].querySelectorAll('[no-prop]'))
+        // Prevent click propagation in elems with attr e50-no-prop
+        angular.element(element[0].querySelectorAll('[e50-no-prop]'))
         .on('click', function(e) {
           e.stopPropagation();
         });
       }
 
+      scope.$watch('data', function() {
+        update();
+      }, true);
+
       // Watch for changes to data
-      scope.$watchCollection('[data, sort, sortOrder]', function() {
+      scope.$watchCollection('[sort, sortOrder]', function() {
         update();
       });
 
@@ -85,7 +89,7 @@ angular.module('e50Table').directive('e50Table', function (Poll, $parse, $compil
             });
         };
         // Only fetch once if desired
-        if (typeof attrs.fetchOnce !== 'undefined') {
+        if (typeof attrs.e50FetchOnce !== 'undefined') {
           fetch();
           // Otherwise, fetch whenever the params change
         } else {
@@ -93,7 +97,7 @@ angular.module('e50Table').directive('e50Table', function (Poll, $parse, $compil
         }
 
         // Start polling if element has poll attr
-        if (typeof attrs.poll !== 'undefined') {
+        if (typeof attrs.e50Poll !== 'undefined') {
           var poll = new Poll(fetch, scope.poll);
           scope.$on('$destroy', function() {
             poll.stop();

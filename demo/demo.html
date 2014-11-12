@@ -16,23 +16,21 @@
       <table e50-table e50-use="hi,bye" e50-row-hover e50-data="people">
         <thead>
           <tr>
-            <td>Claim</td>
-            <td>Address</td>
-            <td>Actions</td>
-            <td>Actions</td>
+            <th>Claim</th>
+            <th>Address</th>
+            <th>Count</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
+          <tr ng-click="hi()">
             <td ng-bind="name"></td>
             <td ng-bind="address"></td>
-            <td ng-bind="actions"></td>
+            <td ng-bind="count"></td>
             <td><a e50-no-prop ng-click="bye()">Bye</a></td>
           </tr>
         </tbody>
       </table>
-
-      <pre>{{ people }}</pre>
     </div>
 
     <script src="http://localhost:2342/livereload.js"></script>

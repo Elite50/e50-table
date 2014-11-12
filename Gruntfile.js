@@ -24,7 +24,8 @@ module.exports = function(grunt) {
         options: {
           livereload: 2342
         },
-        files: ['demo/*.css', 'src/**/*.js', 'demo/*.html', 'demo/*.js', 'Gruntfile.js']
+        files: ['demo/*.css', 'src/**/*.js', 'demo/*.html', 'demo/*.js', 'Gruntfile.js'],
+        tasks: ['default']
       }
     }
   });

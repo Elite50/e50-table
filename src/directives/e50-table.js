@@ -4,9 +4,7 @@ angular.module('e50Table').directive('e50Table', function ($parse, $compile) {
     scope: {
       data: '=?e50Data',
       fetchParams: '=?e50FetchParams',
-      fetchBody: '=?e50FetchBody',
-      sort: '@e50Sort',
-      sortOrder: '@e50SortOrder'
+      fetchBody: '=?e50FetchBody'
     },
     controller: function($scope) {
       this.$scope = $scope;
@@ -48,22 +46,22 @@ angular.module('e50Table').directive('e50Table', function ($parse, $compile) {
         });
       }
 
-      // Watch for changes that require table re-draw
-      scope.$watch('[data, sort, sortOrder]', function() {
-        update();
-      }, true);
-
       // Sort based on data key and provided order
       function sort(a, b) {
-        var order = scope.sortOrder === 'desc' ? 'desc' : 'asc';
-        if (a[scope.sort] < b[scope.sort]) {
+        var order = attrs.e50SortOrder === 'desc' ? 'desc' : 'asc';
+        if (a[attrs.e50Sort] < b[attrs.e50Sort]) {
           return order === 'asc' ? -1 : 1;
-        } else if (a[scope.sort] > b[scope.sort]) {
+        } else if (a[attrs.e50Sort] > b[attrs.e50Sort]) {
           return order === 'asc' ? 1 : -1;
         } else {
           return 0;
         }
       }
+
+      // Watch for changes to data
+      scope.$watch('data', update, true);
+      attrs.$observe('e50Sort', update);
+      attrs.$observe('e50SortOrder', update);
 
     }
   };

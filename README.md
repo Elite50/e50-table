@@ -1,4 +1,4 @@
-# Bower Publishable Angular Directive Boilerplate
+# Elite50 Table Angular Directive
 
 This is a simple AngularJS directive boilerplate to help you start your own AngularJS directive and publish it in Bower and NPM.
 This readme file itself is a boilerplate.
@@ -22,4 +22,4 @@ bower install angular-directive-boilerplate
 ```
 
 ### License
-MIT
+GPLv3

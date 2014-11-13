@@ -21,14 +21,25 @@
       </p>
 
       <div>
-        <table e50-table e50-fetch="http://loc.cs-back.com/testing/:num"
-          e50-fetch-params="{num:num}" e50-poll="2000">
-          <tr e50-table-row ng-click="hi()">
-            <td ng-bind="name"></td>
-            <td ng-bind="address"></td>
-            <td ng-bind="count"></td>
-            <td><a e50-no-prop ng-click="bye()">Bye</a></td>
-          </tr>
+        <table e50-table e50-data="testData"
+          e50-fetch="http://loc.cs-back.com/testing/:num"
+          e50-fetch-params="{num:num}" e50-poll="2000" e50-data-key="d">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Address</th>
+              <th>Count</th>
+              <th>{{ testBye }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr e50-table-row e50-hover ng-click="clickRow()">
+              <td>{{ d.name }}</td>
+              <td>{{ d.address }}</td>
+              <td ng-bind="d.count"></td>
+              <td><a href="" e50-no-prop ng-click="clickLink()">Clickable</a></td>
+            </tr>
+          </body>
         </table>
       </div>
 
@@ -37,14 +48,15 @@
       <p>
         Changed every 3 seconds. Sorting on <em>count</em>.
         Click to toggle sort order:
-        <a href="" ng-click="toggleSort()" ng-bind="sort.toUpperCase()"></a>
+        <a href="" ng-click="toggleSort()" ng-if="sort">DESC</a>
+        <a href="" ng-click="toggleSort()" ng-if="!sort">ASC</a>
       </p>
 
       <div ng-if="!people.length">No People</div>
 
       <div ng-if="people.length">
         <table e50-table e50-use="clickRow,clickLink" e50-data="people"
-          e50-sort="count" e50-sort-order="{{sort}}">
+          e50-sort="count" e50-sort-reverse="{{sort}}">
           <thead>
             <tr>
               <th>Claim</th>
@@ -55,10 +67,10 @@
           </thead>
           <tbody>
             <tr e50-table-row e50-hover ng-click="clickRow()">
-              <td ng-bind="name"></td>
-              <td ng-bind="address"></td>
-              <td ng-bind="count"></td>
-              <td><a href="" e50-no-prop ng-click="clickLink()">Bye</a></td>
+              <td ng-bind="t.name"></td>
+              <td ng-bind="t.address"></td>
+              <td ng-bind="t.count"></td>
+              <td><a href="" e50-no-prop ng-click="clickLink()">Clickable</a></td>
             </tr>
           </tbody>
         </table>

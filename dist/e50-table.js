@@ -1,11 +1,11 @@
 'use strict';
 angular.module('e50Table', ['ngResource']);
 
-angular.module('e50Table').directive('e50Fetch', ["$resource", "Poll", function ($resource, Poll) {
+angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll", function ($parse, $resource, Poll) {
   return {
     restrict: 'A',
     require: 'e50Table',
-    link: function postLink(scope, element, attrs, ctrl) {
+    link: function(scope, element, attrs) {
 
       // Define the resource to fetch from
       var fetchResource = $resource(attrs.e50Fetch, {}, {
@@ -17,10 +17,10 @@ angular.module('e50Table').directive('e50Fetch', ["$resource", "Poll", function 
       // Fetch the table data
       function fetch() {
         return fetchResource.fetch(
-          ctrl.$scope.fetchParams,
-          ctrl.$scope.fetchBody
+          $parse(attrs.e50FetchParams)(scope),
+          $parse(attrs.e50FetchBody)(scope)
         ).$promise.then(function(response) {
-          ctrl.$scope.data = response.data;
+          scope.e50SetData(response.data);
         });
       }
 
@@ -29,13 +29,18 @@ angular.module('e50Table').directive('e50Fetch', ["$resource", "Poll", function 
         fetch();
       // Otherwise, fetch whenever the params change
       } else {
-        ctrl.$scope.$watch('[fetchParams, fetchBody]', fetch, true);
+        scope.$watch(function() {
+          return [
+            $parse(attrs.e50FetchParams)(scope),
+            $parse(attrs.e50FetchBody)(scope)
+          ];
+        }, fetch, true);
       }
 
       // Start polling if element has poll attr
       if ('e50Poll' in attrs) {
         var poll = new Poll(fetch, attrs.e50Poll);
-        ctrl.$scope.$on('$destroy', function() {
+        scope.$on('$destroy', function() {
           poll.stop();
         });
       }
@@ -43,6 +48,23 @@ angular.module('e50Table').directive('e50Fetch', ["$resource", "Poll", function 
     }
   };
 }]);
+
+angular.module('e50Table').directive('e50Hover', function () {
+  return {
+    restrict: 'A',
+    link: function postLink(scope, element, attrs) {
+
+      // Add hover class for mousing over rows
+      var hoverClass = attrs.e50Hover ? attrs.e50Hover : 'hover';
+      element.on('mouseenter', function() {
+        element.addClass(hoverClass);
+      }).on('mouseleave', function() {
+        element.removeClass(hoverClass);
+      });
+
+    }
+  };
+});
 
 angular.module('e50Table').directive('e50NoProp', function () {
   return {
@@ -55,91 +77,50 @@ angular.module('e50Table').directive('e50NoProp', function () {
   };
 });
 
-angular.module('e50Table').directive('e50TableRow', function () {
+angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
   return {
     restrict: 'A',
-    require: '^e50Table',
-    link: function postLink(scope, element, attrs, ctrl) {
+    scope: true,
+    controller: function() {},
+    compile: function(tElement, tAttrs) {
 
-      // Possibly add hover class for mousing over rows
-      if ('e50Hover' in attrs) {
-        var hoverClass = attrs.e50Hover ? attrs.e50Hover : 'hover';
-        element.on('mouseenter', function() {
-          element.addClass(hoverClass);
-        }).on('mouseleave', function() {
-          element.removeClass(hoverClass);
+      // Create ng-repeat on the e50-table-row
+      var row = tElement[0].querySelector('[e50-table-row]');
+      var rpt = document.createAttribute('ng-repeat');
+      var key = tAttrs.e50DataKey ? tAttrs.e50DataKey : 't';
+      rpt.value = key + ' in e50GetData() | orderBy : e50Sort : e50SortReverse';
+      row.attributes.setNamedItem(rpt);
+
+      return function(scope, element, attrs) {
+        // Observe sorting attributes for interpolated changes
+        attrs.$observe('e50Sort', function(v) {
+          scope.e50Sort = v;
         });
-      }
-
-    }
-  };
-});
-
-angular.module('e50Table').directive('e50Table', ["$parse", "$compile", function ($parse, $compile) {
-  return {
-    restrict: 'A',
-    scope: {
-      data: '=?e50Data',
-      fetchParams: '=?e50FetchParams',
-      fetchBody: '=?e50FetchBody'
-    },
-    controller: ["$scope", function($scope) {
-      this.$scope = $scope;
-    }],
-    link: function postLink(scope, element, attrs) {
-
-      var $row = element[0].querySelector('[e50-table-row]');
-      $row = angular.element($row);
-      var $tbody = $row.parent();
-
-      // Add references to 'used' scope variables to simulate closure
-      var pScope = {};
-      if ('e50Use' in attrs) {
-        // Split on commas, unless there's a semicolon present
-        var refs = attrs.e50Use.split(attrs.e50Use.indexOf(';')>0?';':',');
-        angular.forEach(refs, function(ref) {
-          pScope[ref] = $parse(ref)(scope.$parent);
+        attrs.$observe('e50SortReverse', function(v) {
+          scope.e50SortReverse = v;
         });
-      }
 
-      // Create the actual row markup
-      function update() {
-        $tbody.empty();
-        var tableData = angular.copy(scope.data);
-        // Optionally sort the data
-        if ('e50Sort' in attrs) {
-          tableData.sort(sort);
-        }
-        // Append and compile each row
-        angular.forEach(tableData, function(d) {
-          var newScope = scope.$new(true);
-          // Add the row data
-          angular.extend(newScope, d);
-          // Add the 'used' data
-          angular.extend(newScope, pScope);
-          var $newRow = $row.clone();
-          $tbody.append($newRow);
-          $compile($newRow)(newScope);
-        });
-      }
+        // If using an external data array
+        if ('e50Data' in attrs) {
+          scope.e50GetData = function() {
+            return $parse(attrs.e50Data)(scope);
+          };
+          scope.e50SetData = function(data) {
+            $parse(attrs.e50Data).assign(scope.$parent, data);
+          };
 
-      // Sort based on data key and provided order
-      function sort(a, b) {
-        var order = attrs.e50SortOrder === 'desc' ? 'desc' : 'asc';
-        if (a[attrs.e50Sort] < b[attrs.e50Sort]) {
-          return order === 'asc' ? -1 : 1;
-        } else if (a[attrs.e50Sort] > b[attrs.e50Sort]) {
-          return order === 'asc' ? 1 : -1;
+        // If maintaining all data locally
         } else {
-          return 0;
+          var localData = [];
+          scope.e50GetData = function() {
+            return localData;
+          };
+          scope.e50SetData = function(data) {
+            localData = data;
+          };
         }
-      }
 
-      // Watch for changes to data
-      scope.$watch('data', update, true);
-      attrs.$observe('e50Sort', update);
-      attrs.$observe('e50SortOrder', update);
-
+      };
     }
   };
 }]);

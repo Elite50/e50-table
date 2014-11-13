@@ -3,10 +3,11 @@ angular.module('demo', ['e50Table']);
 angular.module('demo').controller('demoCtrl', function($interval, $scope) {
 
   $scope.num = 5;
-  $scope.sort = 'asc';
+  $scope.sort = false;
+  $scope.testBye = 'BYE';
 
   $scope.toggleSort = function() {
-    $scope.sort = $scope.sort === 'asc' ? 'desc' : 'asc';
+    $scope.sort = !$scope.sort;
   };
 
   $scope.people = [

@@ -1,8 +1,8 @@
-angular.module('e50Table').directive('e50Fetch', function ($resource, Poll) {
+angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Poll) {
   return {
     restrict: 'A',
     require: 'e50Table',
-    link: function postLink(scope, element, attrs, ctrl) {
+    link: function(scope, element, attrs) {
 
       // Define the resource to fetch from
       var fetchResource = $resource(attrs.e50Fetch, {}, {
@@ -14,10 +14,10 @@ angular.module('e50Table').directive('e50Fetch', function ($resource, Poll) {
       // Fetch the table data
       function fetch() {
         return fetchResource.fetch(
-          ctrl.$scope.fetchParams,
-          ctrl.$scope.fetchBody
+          $parse(attrs.e50FetchParams)(scope),
+          $parse(attrs.e50FetchBody)(scope)
         ).$promise.then(function(response) {
-          ctrl.$scope.data = response.data;
+          scope.e50SetData(response.data);
         });
       }
 
@@ -26,13 +26,18 @@ angular.module('e50Table').directive('e50Fetch', function ($resource, Poll) {
         fetch();
       // Otherwise, fetch whenever the params change
       } else {
-        ctrl.$scope.$watch('[fetchParams, fetchBody]', fetch, true);
+        scope.$watch(function() {
+          return [
+            $parse(attrs.e50FetchParams)(scope),
+            $parse(attrs.e50FetchBody)(scope)
+          ];
+        }, fetch, true);
       }
 
       // Start polling if element has poll attr
       if ('e50Poll' in attrs) {
         var poll = new Poll(fetch, attrs.e50Poll);
-        ctrl.$scope.$on('$destroy', function() {
+        scope.$on('$destroy', function() {
           poll.stop();
         });
       }

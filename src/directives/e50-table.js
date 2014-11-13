@@ -1,68 +1,47 @@
-angular.module('e50Table').directive('e50Table', function ($parse, $compile) {
+angular.module('e50Table').directive('e50Table', function ($parse) {
   return {
     restrict: 'A',
-    scope: {
-      data: '=?e50Data',
-      fetchParams: '=?e50FetchParams',
-      fetchBody: '=?e50FetchBody'
-    },
-    controller: function($scope) {
-      this.$scope = $scope;
-    },
-    link: function postLink(scope, element, attrs) {
+    scope: true,
+    controller: function() {},
+    compile: function(tElement, tAttrs) {
 
-      var $row = element[0].querySelector('[e50-table-row]');
-      $row = angular.element($row);
-      var $tbody = $row.parent();
+      // Create ng-repeat on the e50-table-row
+      var row = tElement[0].querySelector('[e50-table-row]');
+      var rpt = document.createAttribute('ng-repeat');
+      var key = tAttrs.e50DataKey ? tAttrs.e50DataKey : 't';
+      rpt.value = key + ' in e50GetData() | orderBy : e50Sort : e50SortReverse';
+      row.attributes.setNamedItem(rpt);
 
-      // Add references to 'used' scope variables to simulate closure
-      var pScope = {};
-      if ('e50Use' in attrs) {
-        // Split on commas, unless there's a semicolon present
-        var refs = attrs.e50Use.split(attrs.e50Use.indexOf(';')>0?';':',');
-        angular.forEach(refs, function(ref) {
-          pScope[ref] = $parse(ref)(scope.$parent);
+      return function(scope, element, attrs) {
+        // Observe sorting attributes for interpolated changes
+        attrs.$observe('e50Sort', function(v) {
+          scope.e50Sort = v;
         });
-      }
-
-      // Create the actual row markup
-      function update() {
-        $tbody.empty();
-        var tableData = angular.copy(scope.data);
-        // Optionally sort the data
-        if ('e50Sort' in attrs) {
-          tableData.sort(sort);
-        }
-        // Append and compile each row
-        angular.forEach(tableData, function(d) {
-          var newScope = scope.$new(true);
-          // Add the row data
-          angular.extend(newScope, d);
-          // Add the 'used' data
-          angular.extend(newScope, pScope);
-          var $newRow = $row.clone();
-          $tbody.append($newRow);
-          $compile($newRow)(newScope);
+        attrs.$observe('e50SortReverse', function(v) {
+          scope.e50SortReverse = v;
         });
-      }
 
-      // Sort based on data key and provided order
-      function sort(a, b) {
-        var order = attrs.e50SortOrder === 'desc' ? 'desc' : 'asc';
-        if (a[attrs.e50Sort] < b[attrs.e50Sort]) {
-          return order === 'asc' ? -1 : 1;
-        } else if (a[attrs.e50Sort] > b[attrs.e50Sort]) {
-          return order === 'asc' ? 1 : -1;
+        // If using an external data array
+        if ('e50Data' in attrs) {
+          scope.e50GetData = function() {
+            return $parse(attrs.e50Data)(scope);
+          };
+          scope.e50SetData = function(data) {
+            $parse(attrs.e50Data).assign(scope.$parent, data);
+          };
+
+        // If maintaining all data locally
         } else {
-          return 0;
+          var localData = [];
+          scope.e50GetData = function() {
+            return localData;
+          };
+          scope.e50SetData = function(data) {
+            localData = data;
+          };
         }
-      }
 
-      // Watch for changes to data
-      scope.$watch('data', update, true);
-      attrs.$observe('e50Sort', update);
-      attrs.$observe('e50SortOrder', update);
-
+      };
     }
   };
 });

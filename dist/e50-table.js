@@ -20,7 +20,9 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
           $parse(attrs.e50FetchParams)(scope),
           $parse(attrs.e50FetchBody)(scope)
         ).$promise.then(function(response) {
-          scope.e50SetData(response.data);
+          if (!angular.equals(scope.e50GetData(),response.data)) {
+            scope.e50SetData(response.data);
+          }
         });
       }
 

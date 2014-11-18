@@ -129,8 +129,15 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
         scope.e50Filter = function(d) {
           if ('e50Filter' in attrs) {
             return $parse(attrs.e50Filter)(scope)(d);
-          } 
+          }
           return true;
+        };
+
+        // Create delete row function
+        scope.e50DeleteRow = function(t) {
+          angular.forEach(scope.e50GetData(), function(row, r) {
+            if (row === t) { scope.e50GetData().splice(r, 1); }
+          });
         };
 
         // Observe sorting attributes for interpolated changes

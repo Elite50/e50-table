@@ -63,7 +63,7 @@
         <tbody>
           <tr e50-table-row e50-hover ng-click="clickRow()">
             <td ng-bind="t.name"></td>
-            <td ng-bind="t.address"></td>
+            <td e50-no-prop ng-click="e50DeleteRow(t)" ng-bind="t.address"></td>
             <td ng-bind="t.count"></td>
             <td><a href="" e50-no-prop ng-click="clickLink()">Clickable</a></td>
           </tr>

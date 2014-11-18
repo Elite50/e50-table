@@ -11,10 +11,18 @@ angular.module('e50Table').directive('e50Table', function ($parse) {
       var row = tElement[0].querySelector('[e50-table-row]');
       var rpt = document.createAttribute('ng-repeat');
       var key = tAttrs.e50DataKey ? tAttrs.e50DataKey : 't';
-      rpt.value = key + ' in e50GetData() | orderBy : e50Sort : e50SortReverse';
+      rpt.value = key + ' in e50GetData() | orderBy : e50Sort : e50SortReverse | filter : e50Filter';
       row.attributes.setNamedItem(rpt);
 
       return function(scope, element, attrs) {
+        // Create filtering function
+        scope.e50Filter = function(d) {
+          if ('e50Filter' in attrs) {
+            return $parse(attrs.e50Filter)(scope)(d);
+          } 
+          return true;
+        };
+
         // Observe sorting attributes for interpolated changes
         attrs.$observe('e50Sort', function(v) {
           scope.e50Sort = v;

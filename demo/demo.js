@@ -10,6 +10,10 @@ angular.module('demo').controller('demoCtrl', function($interval, $scope) {
     $scope.sort = !$scope.sort;
   };
 
+  $scope.filterFunc = function(d) {
+    return d.name.indexOf('h') >= 0;
+  };
+
   $scope.people = [
     {
       id: 1,

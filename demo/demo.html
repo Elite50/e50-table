@@ -20,28 +20,26 @@
         <input type="number" ng-model="num"/>
       </p>
 
-      <div>
-        <table e50-table e50-data="testData"
-          e50-fetch="http://loc.cs-back.com/testing/:num"
-          e50-fetch-params="{num:num}" e50-poll="2000" e50-data-key="d">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Address</th>
-              <th>Count</th>
-              <th>{{ testBye }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr e50-table-row e50-hover ng-click="clickRow()">
-              <td>{{ d.name }}</td>
-              <td>{{ d.address }}</td>
-              <td ng-bind="d.count"></td>
-              <td><a href="" e50-no-prop ng-click="clickLink()">Clickable</a></td>
-            </tr>
-          </body>
-        </table>
-      </div>
+      <table e50-table e50-if-data e50-if-no-data="No data found"
+        e50-fetch="http://loc.cs-back.com/testing/:num"
+        e50-fetch-params="{num:num}" e50-poll="2000" e50-data-key="d">
+        <thead>
+          <tr>
+            <th>{{ e50GetData().length }}</th>
+            <th e50-if-data>Address</th>
+            <th>Count</th>
+            <th>{{ testBye }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr e50-table-row e50-hover ng-click="clickRow()">
+            <td>{{ d.name }}</td>
+            <td>{{ d.address }}</td>
+            <td ng-bind="d.count"></td>
+            <td><a href="" e50-no-prop ng-click="clickLink()">Clickable</a></td>
+          </tr>
+        </body>
+      </table>
 
       <h2>Data manipulated by controller:</h2>
 
@@ -52,29 +50,25 @@
         <a href="" ng-click="toggleSort()" ng-if="!sort">ASC</a>
       </p>
 
-      <div ng-if="!people.length">No People</div>
-
-      <div ng-if="people.length">
-        <table e50-table e50-use="clickRow,clickLink" e50-data="people"
-          e50-sort="count" e50-sort-reverse="{{sort}}">
-          <thead>
-            <tr>
-              <th>Claim</th>
-              <th>Address</th>
-              <th>Count</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr e50-table-row e50-hover ng-click="clickRow()">
-              <td ng-bind="t.name"></td>
-              <td ng-bind="t.address"></td>
-              <td ng-bind="t.count"></td>
-              <td><a href="" e50-no-prop ng-click="clickLink()">Clickable</a></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <table e50-table e50-use="clickRow,clickLink" e50-data="people" e50-if-no-data="No people!"
+        e50-sort="count" e50-sort-reverse="{{sort}}" e50-if-data>
+        <thead>
+          <tr>
+            <th>{{ e50GetData().length }}</th>
+            <th>Address</th>
+            <th>Count</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr e50-table-row e50-hover ng-click="clickRow()">
+            <td ng-bind="t.name"></td>
+            <td ng-bind="t.address"></td>
+            <td ng-bind="t.count"></td>
+            <td><a href="" e50-no-prop ng-click="clickLink()">Clickable</a></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <script src="http://localhost:2342/livereload.js"></script>

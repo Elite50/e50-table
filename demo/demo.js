@@ -57,7 +57,7 @@ angular.module('demo').controller('demoCtrl', function($interval, $scope) {
   }
 
   $interval(function() {
-    if ($scope.people.length < 10) {
+    if ($scope.people.length < 5) {
       var fn = names[rand(names.length)];
       var ln = names[rand(names.length)] + suffs[rand(suffs.length)];
       var csl = cs.length; var vsl = vs.length;

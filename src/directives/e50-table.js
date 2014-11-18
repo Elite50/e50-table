@@ -2,7 +2,9 @@ angular.module('e50Table').directive('e50Table', function ($parse) {
   return {
     restrict: 'A',
     scope: true,
-    controller: function() {},
+    controller: function($scope) {
+      this.$scope = $scope;
+    },
     compile: function(tElement, tAttrs) {
 
       // Create ng-repeat on the e50-table-row

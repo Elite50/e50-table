@@ -6,6 +6,7 @@ angular.module('demo').controller('demoCtrl', function($interval, $scope) {
   $scope.sort = false;
   $scope.testBye = 'BYE';
   $scope.view = 'table';
+  $scope.testName = 'Tess Ting';
 
   $scope.toggleView = function() {
     $scope.view = $scope.view === 'table' ? 'list' : 'table';

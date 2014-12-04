@@ -53,7 +53,7 @@
         <a href="" ng-click="toggleView()" ng-if="view==='list'">LIST</a>
       </p>
 
-      <div e50-table e50-use="clickRow,clickLink" e50-data="people" e50-if-no-data="No people!"
+      <!-- <div e50-table e50-use="clickRow,clickLink" e50-data="people" e50-if-no-data="No people!"
         e50-sort="count" e50-sort-reverse="{{sort}}" e50-if-data e50-views="{{view}}">
         <table e50-view="table">
           <thead>
@@ -76,6 +76,38 @@
         <div e50-view="list">
           <span e50-table-row>{{ t.name }}, </span>
         </div>
+      </div> -->
+
+      <h2>Infinite scroll fetch from server</h2>
+
+      <p>
+        <input type="text" ng-model="testName" />
+      </p>
+
+      <div style="height:400px;overflow:scroll">
+
+        <div e50-table e50-fetch="http://loc.cs-back.com/testing"
+          e50-infinite-scroll e50-fetch-params="{offset:3,limit:50,name:testName}"
+          e50-views="{{view}}" e50-poll>
+          <table e50-view="table">
+            <thead>
+              <th>Number</th>
+              <th>Name</th>
+              <th>Random</th>
+            </thead>
+            <tbody>
+              <tr e50-table-row>
+                <td>{{ t.number }}</td>
+                <td>{{ t.name }}</td>
+                <td>{{ t.random }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div e50-view="list">
+            <span e50-table-row>{{ t.name }}, </span>
+          </div>
+        </div>
+
       </div>
     </div>
 

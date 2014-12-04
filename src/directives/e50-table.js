@@ -2,17 +2,20 @@ angular.module('e50Table').directive('e50Table', function ($parse) {
   return {
     restrict: 'A',
     scope: true,
-    controller: function($scope) {
+    controller: function($scope, $attrs) {
       this.$scope = $scope;
+      this.$attrs = $attrs;
     },
     compile: function(tElement, tAttrs) {
 
       // Create ng-repeat on the e50-table-row
-      var row = tElement[0].querySelector('[e50-table-row]');
-      var rpt = document.createAttribute('ng-repeat');
-      var key = tAttrs.e50DataKey ? tAttrs.e50DataKey : 't';
-      rpt.value = key + ' in e50GetData() | orderBy : e50Sort : e50SortReverse | filter : e50Filter';
-      row.attributes.setNamedItem(rpt);
+      var rows = tElement[0].querySelectorAll('[e50-table-row]');
+      angular.forEach(rows, function(row) {
+        var rpt = document.createAttribute('ng-repeat');
+        var key = tAttrs.e50DataKey ? tAttrs.e50DataKey : 't';
+        rpt.value = key + ' in e50GetData() | orderBy : e50Sort : e50SortReverse | filter : e50Filter';
+        row.attributes.setNamedItem(rpt);
+      });
 
       return function(scope, element, attrs) {
         // Create filtering function

@@ -5,6 +5,11 @@ angular.module('demo').controller('demoCtrl', function($interval, $scope) {
   $scope.num = 5;
   $scope.sort = false;
   $scope.testBye = 'BYE';
+  $scope.view = 'table';
+
+  $scope.toggleView = function() {
+    $scope.view = $scope.view === 'table' ? 'list' : 'table';
+  };
 
   $scope.toggleSort = function() {
     $scope.sort = !$scope.sort;

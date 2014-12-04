@@ -112,17 +112,20 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
   return {
     restrict: 'A',
     scope: true,
-    controller: ["$scope", function($scope) {
+    controller: ["$scope", "$attrs", function($scope, $attrs) {
       this.$scope = $scope;
+      this.$attrs = $attrs;
     }],
     compile: function(tElement, tAttrs) {
 
       // Create ng-repeat on the e50-table-row
-      var row = tElement[0].querySelector('[e50-table-row]');
-      var rpt = document.createAttribute('ng-repeat');
-      var key = tAttrs.e50DataKey ? tAttrs.e50DataKey : 't';
-      rpt.value = key + ' in e50GetData() | orderBy : e50Sort : e50SortReverse | filter : e50Filter';
-      row.attributes.setNamedItem(rpt);
+      var rows = tElement[0].querySelectorAll('[e50-table-row]');
+      angular.forEach(rows, function(row) {
+        var rpt = document.createAttribute('ng-repeat');
+        var key = tAttrs.e50DataKey ? tAttrs.e50DataKey : 't';
+        rpt.value = key + ' in e50GetData() | orderBy : e50Sort : e50SortReverse | filter : e50Filter';
+        row.attributes.setNamedItem(rpt);
+      });
 
       return function(scope, element, attrs) {
         // Create filtering function
@@ -172,6 +175,25 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
     }
   };
 }]);
+
+angular.module('e50Table').directive('e50View', function () {
+  return {
+    restrict: 'A',
+    require: '^e50Table',
+    link: function (scope, element, attrs, ctrl) {
+
+      // Hide & show the element based on current view
+      ctrl.$attrs.$observe('e50Views', function(v) {
+        if (v === attrs.e50View) {
+          element.removeClass('ng-hide');
+        } else {
+          element.addClass('ng-hide');
+        }
+      });
+
+    }
+  };
+});
 
 angular.module('e50Table').factory('Poll', ["$timeout", function($timeout) {
 

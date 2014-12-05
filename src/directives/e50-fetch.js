@@ -99,8 +99,6 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
       } else {
         scope.$watch(function() {
           return [
-            offset,
-            limit,
             $parse(attrs.e50FetchParams)(scope),
             $parse(attrs.e50FetchBody)(scope)
           ];
@@ -130,6 +128,7 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
               } else {
                 offset += limit;
               }
+              fetch();
               infiniteLoading = true;
             }
           });

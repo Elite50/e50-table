@@ -20,20 +20,22 @@ angular.module('demo').controller('demoCtrl', function($interval, $scope) {
     return d.name.indexOf('h') >= 0;
   };
 
-  $scope.people = [
-    {
-      id: 1,
-      name: 'John Doe',
-      address: '815 Ocean Drive',
-      count: 14
-    },
-    {
-      id: 2,
-      name: 'Jane Doe',
-      address: '42 Hatch Road',
-      count: 51
-    }
-  ];
+  $scope.people = {
+    peeps: [
+      {
+        id: 1,
+        name: 'John Doe',
+        address: '815 Ocean Drive',
+        count: 14
+      },
+      {
+        id: 2,
+        name: 'Jane Doe',
+        address: '42 Hatch Road',
+        count: 51
+      }
+    ]
+  };
 
   $scope.clickRow = function() {
     alert('You\'ve clicked a row!');
@@ -67,20 +69,20 @@ angular.module('demo').controller('demoCtrl', function($interval, $scope) {
   }
 
   $interval(function() {
-    if ($scope.people.length < 5) {
+    if ($scope.people.peeps.length < 5) {
       var fn = names[rand(names.length)];
       var ln = names[rand(names.length)] + suffs[rand(suffs.length)];
       var csl = cs.length; var vsl = vs.length;
       var street = cs[rand(csl)].toUpperCase() + vs[rand(vsl)] + vs[rand(vsl)];
       street += cs[rand(csl)] + vs[rand(vsl)] + cs[rand(csl)];
-      $scope.people.push({
-        id: $scope.people.length,
+      $scope.people.peeps.push({
+        id: $scope.people.peeps.length,
         name: fn + ' ' + ln,
         address: (rand(2000)+1) + ' ' + street + ' ' + streets[rand(streets.length)],
         count: rand(100)+1
       });
     } else {
-      $scope.people = [];
+      $scope.people.peeps = [];
     }
   }, 3000);
 });

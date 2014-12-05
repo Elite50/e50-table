@@ -117,8 +117,8 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
        * jQLite implementation, adapted from slindberg/jquery-scrollparent
        */
       function scrollParentFn(elem) {
-        var position = elem.css("position");
-        var excludeStaticParent = position === "absolute";
+        var position = elem.css('position');
+        var excludeStaticParent = position === 'absolute';
         var parent;
         for (parent = elem.parent(); parent; parent = parent.parent()) {
           if (excludeStaticParent && parent.css('position') === 'static') {

@@ -120,8 +120,8 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
        * jQLite implementation, adapted from slindberg/jquery-scrollparent
        */
       function scrollParentFn(elem) {
-        var position = elem.css("position");
-        var excludeStaticParent = position === "absolute";
+        var position = elem.css('position');
+        var excludeStaticParent = position === 'absolute';
         var parent;
         for (parent = elem.parent(); parent; parent = parent.parent()) {
           if (excludeStaticParent && parent.css('position') === 'static') {
@@ -160,7 +160,7 @@ angular.module('e50Table').directive('e50IfData', function () {
   return {
     restrict: 'A',
     require: '^e50Table',
-    link: function (scope, element, attrs) {
+    link: function (scope, element, attrs, ctrl) {
 
       var show = attrs.e50IfData !== 'false';
       var replace = attrs.e50IfNoData ? attrs.e50IfNoData : null;
@@ -168,7 +168,8 @@ angular.module('e50Table').directive('e50IfData', function () {
 
       // Hide & show the element based on data status
       scope.$watchCollection('e50GetData()', function(v) {
-        if (v.length && show || !(v.length || show)) {
+        var data = 'e50DataProp' in ctrl.$attrs ? v[ctrl.$attrs.e50DataProp] : v;
+        if (data.length && show || !(data.length || show)) {
           if (replace) {
             $none.remove();
           }
@@ -210,8 +211,9 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
       var rows = tElement[0].querySelectorAll('[e50-table-row]');
       angular.forEach(rows, function(row) {
         var rpt = document.createAttribute('ng-repeat');
-        var key = tAttrs.e50DataKey ? tAttrs.e50DataKey : 't';
-        rpt.value = key + ' in e50GetData() | orderBy : e50Sort : e50SortReverse | filter : e50Filter';
+        var key = 'e50DataKey' in tAttrs ? tAttrs.e50DataKey : 't';
+        var prop = 'e50DataProp' in tAttrs ? '.' + tAttrs.e50DataProp : '';
+        rpt.value = key + ' in e50GetData()' + prop + ' | orderBy : e50Sort : e50SortReverse | filter : e50Filter';
         row.attributes.setNamedItem(rpt);
       });
 

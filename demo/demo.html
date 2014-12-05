@@ -53,7 +53,7 @@
         <a href="" ng-click="toggleView()" ng-if="view==='list'">LIST</a>
       </p>
 
-      <!-- <div e50-table e50-use="clickRow,clickLink" e50-data="people" e50-if-no-data="No people!"
+      <div e50-table e50-use="clickRow,clickLink" e50-data="people" e50-data-prop="peeps" e50-if-no-data="No people!"
         e50-sort="count" e50-sort-reverse="{{sort}}" e50-if-data e50-views="{{view}}">
         <table e50-view="table">
           <thead>
@@ -76,7 +76,9 @@
         <div e50-view="list">
           <span e50-table-row>{{ t.name }}, </span>
         </div>
-      </div> -->
+      </div>
+
+      <pre>{{people}}</pre>
 
       <h2>Infinite scroll fetch from server</h2>
 

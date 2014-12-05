@@ -2,7 +2,7 @@ angular.module('e50Table').directive('e50IfData', function () {
   return {
     restrict: 'A',
     require: '^e50Table',
-    link: function (scope, element, attrs) {
+    link: function (scope, element, attrs, ctrl) {
 
       var show = attrs.e50IfData !== 'false';
       var replace = attrs.e50IfNoData ? attrs.e50IfNoData : null;
@@ -10,7 +10,8 @@ angular.module('e50Table').directive('e50IfData', function () {
 
       // Hide & show the element based on data status
       scope.$watchCollection('e50GetData()', function(v) {
-        if (v.length && show || !(v.length || show)) {
+        var data = 'e50DataProp' in ctrl.$attrs ? v[ctrl.$attrs.e50DataProp] : v;
+        if (data.length && show || !(data.length || show)) {
           if (replace) {
             $none.remove();
           }

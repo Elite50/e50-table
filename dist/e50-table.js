@@ -59,7 +59,15 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
           if (!angular.equals(scope.e50GetData(),response.data)) {
             if (append) {
               // If appending
-              scope.e50SetData(scope.e50GetData().concat(response.data));
+              var args, array;
+              if ('e50DataProp' in attrs) {
+                args = response.data[attrs.e50DataProp];
+                array = scope.e50GetData()[attrs.e50DataProp];
+              } else {
+                args = response.data;
+                array = scope.e50GetData();
+              }
+              Array.prototype.push.apply(array, args);
             } else {
               // If replacing
               scope.e50SetData(response.data);

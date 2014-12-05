@@ -11,7 +11,7 @@ angular.module('e50Table').directive('e50IfData', function () {
       // Hide & show the element based on data status
       scope.$watchCollection('e50GetData()', function(v) {
         var data = 'e50DataProp' in ctrl.$attrs ? v[ctrl.$attrs.e50DataProp] : v;
-        if (data.length && show || !(data.length || show)) {
+        if (typeof data !== 'undefined' && (data.length && show || !(data.length || show))) {
           if (replace) {
             $none.remove();
           }

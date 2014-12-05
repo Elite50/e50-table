@@ -9,8 +9,8 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
       var infiniteLoading = false;
 
       // Get initial params and body
-      var params = $parse(attrs.e50FetchParams)(scope);
-      var body = $parse(attrs.e50FetchBody)(scope);
+      var params = angular.copy($parse(attrs.e50FetchParams)(scope));
+      var body = angular.copy($parse(attrs.e50FetchBody)(scope));
 
       // If infinite scrolling enabled
       if (infinite) {
@@ -31,8 +31,8 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
 
       // Fetch the table data
       function fetch() {
-        params = $parse(attrs.e50FetchParams)(scope);
-        body = $parse(attrs.e50FetchBody)(scope);
+        params = angular.copy($parse(attrs.e50FetchParams)(scope));
+        body = angular.copy($parse(attrs.e50FetchBody)(scope));
         var append = false;
         if (infinite) {
           if (!polling) {

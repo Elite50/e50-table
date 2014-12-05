@@ -55,6 +55,14 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
             objL.limit = limit;
           }
         }
+        if ('e50Loading' in attrs) {
+          var message = append ? 'e50-table-infinite-loading' : 'e50-table-loading';
+          if (attrs.e50Loading !== 'emit') {
+            scope.$broadcast('loading-show', message);
+          } else if (attrs.e50Loading !== 'broadcast') {
+            scope.$emit('loading-show', message);
+          }
+        }
         return fetchResource.fetch(params,body).$promise.then(function(response) {
           if (!angular.equals(scope.e50GetData(),response.data)) {
             if (append) {
@@ -75,6 +83,15 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
             if (infinite) { infiniteScroll(); }
           }
           infiniteLoading = false;
+        }).finally(function() {
+          if ('e50Loading' in attrs) {
+            var message = append ? 'e50-table-infinite-loading' : 'e50-table-loading';
+            if (attrs.e50Loading !== 'emit') {
+              scope.$broadcast('loading-hide', message);
+            } else if (attrs.e50Loading !== 'broadcast') {
+              scope.$emit('loading-hide', message);
+            }
+          }
         });
       }
 

@@ -59,7 +59,8 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
           var message = append ? 'e50-table-infinite-loading' : 'e50-table-loading';
           if (attrs.e50Loading !== 'emit') {
             scope.$broadcast('loading-show', message);
-          } else if (attrs.e50Loading !== 'broadcast') {
+          }
+          if (attrs.e50Loading !== 'broadcast') {
             scope.$emit('loading-show', message);
           }
         }
@@ -88,7 +89,8 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
             var message = append ? 'e50-table-infinite-loading' : 'e50-table-loading';
             if (attrs.e50Loading !== 'emit') {
               scope.$broadcast('loading-hide', message);
-            } else if (attrs.e50Loading !== 'broadcast') {
+            }
+            if (attrs.e50Loading !== 'broadcast') {
               scope.$emit('loading-hide', message);
             }
           }

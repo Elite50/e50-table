@@ -20,9 +20,9 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
         // Get initial limit and offset
         var offsetKey = 'e50OffsetKey' in attrs ? attrs.e50OffsetKey : 'offset';
         var limitKey = 'e50LimitKey' in attrs ? attrs.e50LimitKey : 'limit';
-        var offset = offsetKey in params ? params.offset : body.offset;
+        var offset = params && offsetKey in params ? params.offset : body.offset;
         var offsetPrev = offset;
-        var limit = limitKey in params ? params.limit : body.limit;
+        var limit = params && limitKey in params ? params.limit : body.limit;
       }
 
       // Define the resource to fetch from
@@ -39,7 +39,7 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
         var append = false;
         if (infinite) {
           if (!polling) {
-            var obj = (offsetKey in params) ? params : body;
+            var obj = (params && offsetKey in params) ? params : body;
             if (offsetPrev !== offset) {
               // If scrolling, update offset
               obj.offset = offset;
@@ -51,7 +51,7 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
             }
           } else {
             // If polling and scrolling, update limit
-            var objL = (limitKey in params) ? params : body;
+            var objL = (params && limitKey in params) ? params : body;
             objL.limit = limit;
           }
         }

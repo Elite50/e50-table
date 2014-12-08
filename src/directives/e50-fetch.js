@@ -51,7 +51,7 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
             limit = lObj.limit;
           }
         }
-        if ('e50Loading' in attrs && !isPoll) {
+        if ('e50Loading' in attrs && !isPoll && !isScroll) {
           if (attrs.e50Loading !== 'emit') { scope.$broadcast('loading-show', 'e50-table-loading'); }
           if (attrs.e50Loading !== 'broadcast') { scope.$emit('loading-show', 'e50-table-loading'); }
         }
@@ -79,7 +79,7 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
           }
         }).finally(function() {
           fetching = false;
-          if ('e50Loading' in attrs && !isPoll) {
+          if ('e50Loading' in attrs && !isPoll && !isScroll) {
             if (attrs.e50Loading !== 'emit') { scope.$broadcast('loading-hide', 'e50-table-loading'); }
             if (attrs.e50Loading !== 'broadcast') { scope.$emit('loading-hide', 'e50-table-loading'); }
           }

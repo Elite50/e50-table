@@ -55,9 +55,12 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
           }
         }
         if ('e50Loading' in attrs && !isPoll) {
-          var message = isScroll ? 'e50-table-infinite-loading' : 'e50-table-loading';
-          if (attrs.e50Loading !== 'emit') { scope.$broadcast('loading-show', message); }
-          if (attrs.e50Loading !== 'broadcast') { scope.$emit('loading-show', message); }
+          if (attrs.e50Loading !== 'emit') { scope.$broadcast('loading-show', 'e50-table-loading'); }
+          if (attrs.e50Loading !== 'broadcast') { scope.$emit('loading-show', 'e50-table-loading'); }
+        }
+        if ('e50InfiniteLoading' in attrs && isScroll) {
+          if (attrs.e50InfiniteLoading !== 'emit') { scope.$broadcast('loading-show', 'e50-table-infinite-loading'); }
+          if (attrs.e50InfiniteLoading !== 'broadcast') { scope.$emit('loading-show', 'e50-table-infinite-loading'); }
         }
         return fetchResource.fetch(params,body).$promise.then(function(response) {
           // If the data has changed
@@ -80,9 +83,12 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
         }).finally(function() {
           fetching = false;
           if ('e50Loading' in attrs && !isPoll) {
-            var message = isScroll ? 'e50-table-infinite-loading' : 'e50-table-loading';
-            if (attrs.e50Loading !== 'emit') { scope.$broadcast('loading-hide', message); }
-            if (attrs.e50Loading !== 'broadcast') { scope.$emit('loading-hide', message); }
+            if (attrs.e50Loading !== 'emit') { scope.$broadcast('loading-hide', 'e50-table-loading'); }
+            if (attrs.e50Loading !== 'broadcast') { scope.$emit('loading-hide', 'e50-table-loading'); }
+          }
+          if ('e50InfiniteLoading' in attrs && isScroll) {
+            if (attrs.e50InfiniteLoading !== 'emit') { scope.$broadcast('loading-hide', 'e50-table-infinite-loading'); }
+            if (attrs.e50InfiniteLoading !== 'broadcast') { scope.$emit('loading-hide', 'e50-table-infinite-loading'); }
           }
         });
       }

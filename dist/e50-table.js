@@ -114,7 +114,7 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
       // Start polling if element has poll attr
       if (polling) {
         var poll = new Poll(function() {
-          fetch(true);
+          return fetch(true);
         }, attrs.e50Poll);
         scope.$on('$destroy', function() {
           poll.stop();

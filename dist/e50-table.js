@@ -23,6 +23,7 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
         var offset = params && offsetKey in params ? params.offset : body.offset;
         var offsetPrev = offset;
         var limit = params && limitKey in params ? params.limit : body.limit;
+        var initialLimit = limit;
       }
 
       // Define the resource to fetch from
@@ -129,7 +130,7 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
                 scrollParent[0].offsetHeight && !infiniteLoading) {
               if (polling) {
                 // Infinite scroll handled differently when polling
-                limit += limit;
+                limit += initialLimit;
               } else {
                 offset += limit;
               }

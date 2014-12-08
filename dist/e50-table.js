@@ -7,9 +7,9 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
     require: 'e50Table',
     link: function(scope, element, attrs) {
 
+      var fetching = false;
       var polling = 'e50Poll' in attrs;
       var infinite = 'e50InfiniteScroll' in attrs;
-      var infiniteLoading = false;
 
       // Get initial params and body
       var params = angular.copy($parse(attrs.e50FetchParams)(scope));
@@ -34,18 +34,21 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
 
       // Fetch the table data
       function fetch(isPoll, isScroll) {
+        fetching = true;
         params = $parse(attrs.e50FetchParams)(scope);
         body = $parse(attrs.e50FetchBody)(scope);
         var append = false;
-        console.log(isPoll ? 'Polling' : isScroll ? 'Scrolling' : 'Fetching');
         if (infinite) {
           var oObj = (params && offsetKey in params) ? params : body;
           var lObj = (params && limitKey in params) ? params : body;
+          // If it's a non-polling infinite scroll, fetch the next several rows
           if (isScroll && !polling) {
             oObj.offset = offset;
             append = true;
+          // If it's a polling poll or scroll, fetch all with the increased limit
           } else if (polling && (isPoll || isScroll)) {
             lObj.limit = limit;
+          // Otherwise, reset everything because some other parameter has changed
           } else {
             offset = oObj.offset;
             limit = lObj.limit;
@@ -53,17 +56,12 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
         }
         if ('e50Loading' in attrs && !isPoll) {
           var message = isScroll ? 'e50-table-infinite-loading' : 'e50-table-loading';
-          if (attrs.e50Loading !== 'emit') {
-            scope.$broadcast('loading-show', message);
-          }
-          if (attrs.e50Loading !== 'broadcast') {
-            scope.$emit('loading-show', message);
-          }
+          if (attrs.e50Loading !== 'emit') { scope.$broadcast('loading-show', message); }
+          if (attrs.e50Loading !== 'broadcast') { scope.$emit('loading-show', message); }
         }
         return fetchResource.fetch(params,body).$promise.then(function(response) {
           // If the data has changed
           if (!angular.equals(scope.e50GetData(),response.data)) {
-            console.log('Data has changed!');
             // If appending
             if (append) {
               var args = response.data;
@@ -79,16 +77,12 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
             }
             if (infinite) { infiniteScroll(); }
           }
-          infiniteLoading = false;
         }).finally(function() {
+          fetching = false;
           if ('e50Loading' in attrs && !isPoll) {
             var message = isScroll ? 'e50-table-infinite-loading' : 'e50-table-loading';
-            if (attrs.e50Loading !== 'emit') {
-              scope.$broadcast('loading-hide', message);
-            }
-            if (attrs.e50Loading !== 'broadcast') {
-              scope.$emit('loading-hide', message);
-            }
+            if (attrs.e50Loading !== 'emit') { scope.$broadcast('loading-hide', message); }
+            if (attrs.e50Loading !== 'broadcast') { scope.$emit('loading-hide', message); }
           }
         });
       }
@@ -108,7 +102,7 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
         }, true);
       }
 
-      // Start polling if element has poll attr
+      // Start polling if element has poll attribute
       if (polling) {
         var poll = new Poll(function() {
           return fetch(true);
@@ -126,15 +120,15 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
           var lasts = element[0].querySelectorAll('[e50-table-row]:last-child');
           angular.forEach(lasts, function(last) {
             if (last.offsetHeight && last.offsetTop < scrollParent[0].scrollTop +
-                scrollParent[0].offsetHeight && !infiniteLoading) {
+                scrollParent[0].offsetHeight && !fetching) {
+              // If polling, just up the total limit
               if (polling) {
-                // Infinite scroll handled differently when polling
                 limit += initialLimit;
+              // Otherwise, fetch the next several rows
               } else {
                 offset += limit;
               }
               fetch(false, true);
-              infiniteLoading = true;
             }
           });
         });

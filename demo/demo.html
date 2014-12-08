@@ -16,27 +16,25 @@
       <h2>Fetching data from server:</h2>
 
       <p>
-      <!--Polling every 2 seconds. -->Number of entries to fetch:
+        Polling every 2 seconds. Number of entries to fetch:
         <input type="number" ng-model="num"/>
       </p>
 
       <table e50-table e50-if-data e50-if-no-data="No data found"
-        e50-fetch="http://loc.cs-back.com/testing/:num"
+        e50-fetch="http://loc.cs-back.com/testing/:num" e50-data-prop="list"
         e50-fetch-params="{num:num}" e50-data-key="d">
         <thead>
           <tr>
-            <th>{{ e50GetData().length }}</th>
-            <th e50-if-data>Address</th>
-            <th>Count</th>
-            <th>{{ testBye }}</th>
+            <th>{{ e50GetData().total }}</th>
+            <th>Name</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr e50-table-row e50-hover ng-click="clickRow()">
+            <td>{{ d.number }}</td>
             <td>{{ d.name }}</td>
-            <td>{{ d.address }}</td>
-            <td ng-bind="d.count"></td>
-            <td><a href="" e50-no-prop ng-click="clickLink()">Clickable</a></td>
+            <td>{{ d.random }}</td>
           </tr>
         </body>
       </table>
@@ -86,9 +84,9 @@
         <input type="text" ng-model="testName" />
       </p>
 
-      <div style="height:400px;overflow:scroll">
+      <div style="height:300px;overflow:scroll">
 
-        <div e50-table e50-fetch="http://loc.cs-back.com/testing" e50-loading
+        <div e50-table e50-fetch="http://loc.cs-back.com/testing" e50-loading e50-poll="3000"
           e50-infinite-scroll e50-fetch-body="{offset:3,limit:50,name:testName}"
           e50-views="{{view}}" e50-fetch-method="POST" e50-data-prop="thing">
           <table e50-view="table">
@@ -114,7 +112,7 @@
     </div>
 
     <script src="http://localhost:2342/livereload.js"></script>
-    <script src="../dist/e50-table.min.js"></script>
+    <script src="../dist/e50-table.js"></script>
     <script src="demo.js"></script>
   </body>
 </html>

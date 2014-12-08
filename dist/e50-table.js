@@ -21,7 +21,6 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
         var offsetKey = 'e50OffsetKey' in attrs ? attrs.e50OffsetKey : 'offset';
         var limitKey = 'e50LimitKey' in attrs ? attrs.e50LimitKey : 'limit';
         var offset = params && offsetKey in params ? params.offset : body.offset;
-        var offsetPrev = offset;
         var limit = params && limitKey in params ? params.limit : body.limit;
         var initialLimit = limit;
       }
@@ -34,31 +33,26 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
       });
 
       // Fetch the table data
-      function fetch(poll) {
-        params = angular.copy($parse(attrs.e50FetchParams)(scope));
-        body = angular.copy($parse(attrs.e50FetchBody)(scope));
+      function fetch(isPoll, isScroll) {
+        params = $parse(attrs.e50FetchParams)(scope);
+        body = $parse(attrs.e50FetchBody)(scope);
         var append = false;
+        console.log(isPoll ? 'Polling' : isScroll ? 'Scrolling' : 'Fetching');
         if (infinite) {
-          if (!polling) {
-            var obj = (params && offsetKey in params) ? params : body;
-            if (offsetPrev !== offset) {
-              // If scrolling, update offset
-              obj.offset = offset;
-              offsetPrev = offset;
-              append = true;
-            } else {
-              // Something else changed, reset offset
-              offset = obj.offset;
-            }
+          var oObj = (params && offsetKey in params) ? params : body;
+          var lObj = (params && limitKey in params) ? params : body;
+          if (isScroll && !polling) {
+            oObj.offset = offset;
+            append = true;
+          } else if (polling && (isPoll || isScroll)) {
+            lObj.limit = limit;
           } else {
-            // If polling and scrolling, update limit
-            var objL = (params && limitKey in params) ? params : body;
-            objL.limit = limit;
-            append = 'fake';
+            offset = oObj.offset;
+            limit = lObj.limit;
           }
         }
-        if ('e50Loading' in attrs && !poll) {
-          var message = append ? 'e50-table-infinite-loading' : 'e50-table-loading';
+        if ('e50Loading' in attrs && !isPoll) {
+          var message = isScroll ? 'e50-table-infinite-loading' : 'e50-table-loading';
           if (attrs.e50Loading !== 'emit') {
             scope.$broadcast('loading-show', message);
           }
@@ -67,28 +61,28 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
           }
         }
         return fetchResource.fetch(params,body).$promise.then(function(response) {
+          // If the data has changed
           if (!angular.equals(scope.e50GetData(),response.data)) {
-            if (append === true) {
-              // If appending
-              var args, array;
+            console.log('Data has changed!');
+            // If appending
+            if (append) {
+              var args = response.data;
+              var array = scope.e50GetData();
               if ('e50DataProp' in attrs) {
-                args = response.data[attrs.e50DataProp];
-                array = scope.e50GetData()[attrs.e50DataProp];
-              } else {
-                args = response.data;
-                array = scope.e50GetData();
+                args = args[attrs.e50DataProp];
+                array = array[attrs.e50DataProp];
               }
               Array.prototype.push.apply(array, args);
+            // If replacing
             } else {
-              // If replacing
               scope.e50SetData(response.data);
             }
             if (infinite) { infiniteScroll(); }
           }
           infiniteLoading = false;
         }).finally(function() {
-          if ('e50Loading' in attrs && !poll) {
-            var message = append ? 'e50-table-infinite-loading' : 'e50-table-loading';
+          if ('e50Loading' in attrs && !isPoll) {
+            var message = isScroll ? 'e50-table-infinite-loading' : 'e50-table-loading';
             if (attrs.e50Loading !== 'emit') {
               scope.$broadcast('loading-hide', message);
             }
@@ -109,7 +103,9 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
             $parse(attrs.e50FetchParams)(scope),
             $parse(attrs.e50FetchBody)(scope)
           ];
-        }, fetch, true);
+        }, function() {
+          fetch();
+        }, true);
       }
 
       // Start polling if element has poll attr
@@ -137,7 +133,7 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
               } else {
                 offset += limit;
               }
-              fetch();
+              fetch(false, true);
               infiniteLoading = true;
             }
           });

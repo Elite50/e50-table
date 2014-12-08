@@ -5,6 +5,7 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
     link: function(scope, element, attrs) {
 
       var fetching = false;
+      var hasMore = true;
       var polling = 'e50Poll' in attrs;
       var infinite = 'e50InfiniteScroll' in attrs;
 
@@ -32,6 +33,7 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
       // Fetch the table data
       function fetch(isPoll, isScroll) {
         fetching = true;
+        hasMore = true;
         params = $parse(attrs.e50FetchParams)(scope);
         body = $parse(attrs.e50FetchBody)(scope);
         var append = false;
@@ -70,12 +72,15 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
                 args = args[attrs.e50DataProp];
                 array = array[attrs.e50DataProp];
               }
+              if (!array.length) { hasMore = false; }
               Array.prototype.push.apply(array, args);
             // If replacing
             } else {
               scope.e50SetData(response.data);
             }
             if (infinite) { infiniteScroll(); }
+          } else if (isScroll) {
+            hasMore = false;
           }
         }).finally(function() {
           fetching = false;
@@ -123,7 +128,7 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
           var lasts = element[0].querySelectorAll('[e50-table-row]:last-child');
           angular.forEach(lasts, function(last) {
             if (last.offsetHeight && last.offsetTop < scrollParent[0].scrollTop +
-                scrollParent[0].offsetHeight && !fetching) {
+                scrollParent[0].offsetHeight && !fetching && hasMore) {
               // If polling, just up the total limit
               if (polling) {
                 limit += initialLimit;

@@ -54,6 +54,7 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
             // If polling and scrolling, update limit
             var objL = (params && limitKey in params) ? params : body;
             objL.limit = limit;
+            append = 'fake';
           }
         }
         if ('e50Loading' in attrs && !poll) {
@@ -67,7 +68,7 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
         }
         return fetchResource.fetch(params,body).$promise.then(function(response) {
           if (!angular.equals(scope.e50GetData(),response.data)) {
-            if (append) {
+            if (append === true) {
               // If appending
               var args, array;
               if ('e50DataProp' in attrs) {

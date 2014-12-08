@@ -36,7 +36,6 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
       // Fetch the table data
       function fetch(isPoll, isScroll) {
         fetching = true;
-        hasMore = true;
         params = $parse(attrs.e50FetchParams)(scope);
         body = $parse(attrs.e50FetchBody)(scope);
         var append = false;
@@ -65,6 +64,7 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
           if (attrs.e50InfiniteLoading !== 'broadcast') { scope.$emit('loading-show', 'e50-table-infinite-loading'); }
         }
         return fetchResource.fetch(params,body).$promise.then(function(response) {
+          hasMore = true;
           // If the data has changed
           if (!angular.equals(scope.e50GetData(),response.data)) {
             // If appending

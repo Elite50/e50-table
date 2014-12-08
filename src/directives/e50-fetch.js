@@ -31,7 +31,7 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
       });
 
       // Fetch the table data
-      function fetch() {
+      function fetch(poll) {
         params = angular.copy($parse(attrs.e50FetchParams)(scope));
         body = angular.copy($parse(attrs.e50FetchBody)(scope));
         var append = false;
@@ -53,7 +53,7 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
             objL.limit = limit;
           }
         }
-        if ('e50Loading' in attrs) {
+        if ('e50Loading' in attrs && !poll) {
           var message = append ? 'e50-table-infinite-loading' : 'e50-table-loading';
           if (attrs.e50Loading !== 'emit') {
             scope.$broadcast('loading-show', message);
@@ -83,7 +83,7 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
           }
           infiniteLoading = false;
         }).finally(function() {
-          if ('e50Loading' in attrs) {
+          if ('e50Loading' in attrs && !poll) {
             var message = append ? 'e50-table-infinite-loading' : 'e50-table-loading';
             if (attrs.e50Loading !== 'emit') {
               scope.$broadcast('loading-hide', message);
@@ -110,7 +110,9 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
 
       // Start polling if element has poll attr
       if (polling) {
-        var poll = new Poll(fetch, attrs.e50Poll);
+        var poll = new Poll(function() {
+          fetch(true);
+        }, attrs.e50Poll);
         scope.$on('$destroy', function() {
           poll.stop();
         });

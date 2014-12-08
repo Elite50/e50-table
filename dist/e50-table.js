@@ -75,7 +75,7 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
                 args = args[attrs.e50DataProp];
                 array = array[attrs.e50DataProp];
               }
-              if (!array.length) { hasMore = false; }
+              if (!args.length) { hasMore = false; }
               Array.prototype.push.apply(array, args);
             // If replacing
             } else {

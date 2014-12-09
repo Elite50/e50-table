@@ -61,9 +61,9 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
           if (attrs.e50InfiniteLoading !== 'broadcast') { scope.$emit('loading-show', 'e50-table-infinite-loading'); }
         }
         return fetchResource.fetch(params,body).$promise.then(function(response) {
-          hasMore = true;
           // If the data has changed
           if (!angular.equals(scope.e50GetData(),response.data)) {
+            hasMore = true;
             // If appending
             if (append) {
               var args = response.data;

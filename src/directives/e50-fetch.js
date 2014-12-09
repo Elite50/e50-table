@@ -95,10 +95,12 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
         });
       }
 
-      fetch();
+      // Only fetch once if desired
+      if ('e50FetchOnce' in attrs) {
+        fetch();
 
-      // Fetch regularly if desired
-      if (!('e50FetchOnce' in attrs)) {
+      // Otherwise fetch regularly
+      } else {
         scope.$watch(function() {
           return [
             $parse(attrs.e50FetchParams)(scope),

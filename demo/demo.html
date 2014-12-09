@@ -20,9 +20,17 @@
         <input type="number" ng-model="num"/>
       </p>
 
-      <table e50-table e50-if-data e50-if-no-data="No data found"
-        e50-fetch="http://loc.cs-back.com/testing/:num" e50-data-prop="list"
-        e50-fetch-params="{num:num}" e50-data-key="d">
+      <table 
+        e50-table 
+        e50-if-data 
+        e50-if-no-data="No data found"
+        e50-fetch="http://loc.cs-back.com/testing/:num" 
+        e50-data-prop="list"
+        e50-fetch-params="{num:num}" 
+        e50-fetch-limit="100"
+        e50-fetch-limit-prop="total"
+        e50-data-key="d"
+        e50-poll>
         <thead>
           <tr>
             <th>{{ e50GetData().total }}</th>

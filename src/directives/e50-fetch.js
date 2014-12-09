@@ -95,18 +95,22 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
         });
       }
 
-      // Only fetch once if desired
-      if ('e50FetchOnce' in attrs) {
-        fetch();
-      // Otherwise, fetch whenever the params change
-      } else {
+      fetch();
+
+      // Fetch regularly if desired
+      if (!('e50FetchOnce' in attrs)) {
         scope.$watch(function() {
           return [
             $parse(attrs.e50FetchParams)(scope),
             $parse(attrs.e50FetchBody)(scope)
           ];
         }, function() {
-          fetch();
+          // Don't fetch if sorting should be done client-side
+          if (!('e50FetchLimit' in attrs && 'e50FetchLimitProp' in attrs &&
+                scope.e50GetData()[attrs.e50FetchLimitProp] <=
+                attrs.e50FetchLimit)) {
+            fetch();
+          }
         }, true);
       }
 

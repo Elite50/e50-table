@@ -274,8 +274,12 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
 
         // Create delete row function
         scope.e50DeleteRow = function(t) {
-          angular.forEach(scope.e50GetData(), function(row, r) {
-            if (row === t) { scope.e50GetData().splice(r, 1); }
+          var rows = scope.e50GetData();
+          if ('e50DataProp' in attrs) {
+            rows = rows[attrs.e50DataProp];
+          }
+          angular.forEach(rows, function(row, r) {
+            if (row === t) { rows.splice(r, 1); }
           });
         };
 

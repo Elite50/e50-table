@@ -32,9 +32,11 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
 
       // Fetch the table data
       function fetch(isPoll, isScroll) {
+        console.log(isPoll);
+        console.log(isScroll);
         fetching = true;
-        params = $parse(attrs.e50FetchParams)(scope);
-        body = $parse(attrs.e50FetchBody)(scope);
+        params = angular.copy($parse(attrs.e50FetchParams)(scope));
+        body = angular.copy($parse(attrs.e50FetchBody)(scope));
         var append = false;
         if (infinite) {
           var oObj = (params && offsetKey in params) ? params : body;

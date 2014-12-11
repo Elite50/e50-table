@@ -284,6 +284,7 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
       return function(scope, element, attrs) {
         // Create filtering function
         scope.e50Filter = function(d) {
+          if (d.e50Deleted) { return false; }
           if ('e50Filter' in attrs) {
             return $parse(attrs.e50Filter)(scope)(d);
           }
@@ -292,13 +293,7 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
 
         // Create delete row function
         scope.e50DeleteRow = function(t) {
-          var rows = scope.e50GetData();
-          if ('e50DataProp' in attrs) {
-            rows = rows[attrs.e50DataProp];
-          }
-          angular.forEach(rows, function(row, r) {
-            if (row === t) { rows.splice(r, 1); }
-          });
+          t.e50Deleted = true;
         };
 
         // Observe sorting attributes for interpolated changes

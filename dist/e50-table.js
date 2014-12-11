@@ -282,9 +282,11 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
       });
 
       return function(scope, element, attrs) {
+        var deleted = [];
+
         // Create filtering function
         scope.e50Filter = function(d) {
-          if (d.e50Deleted) { return false; }
+          if (deleted.indexOf(d.id) >= 0) { return false; }
           if ('e50Filter' in attrs) {
             return $parse(attrs.e50Filter)(scope)(d);
           }
@@ -293,7 +295,7 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
 
         // Create delete row function
         scope.e50DeleteRow = function(t) {
-          t.e50Deleted = true;
+          deleted.push(t.id);
         };
 
         // Observe sorting attributes for interpolated changes

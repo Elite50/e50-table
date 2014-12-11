@@ -14,22 +14,40 @@ angular.module('e50Table').directive('e50IfData', function () {
       // Hide & show the element based on data status
       scope.$watchCollection('e50GetData()', function(v) {
         var data = 'e50DataProp' in ctrl.$attrs ? v[ctrl.$attrs.e50DataProp] : v;
-        if (typeof data !== 'undefined' && (data.length && show || !(data.length || show))) {
-          if (replace) {
-            $none.remove();
-          }
+
+        // If nothing has ever been successfully fetched
+        if (typeof data === 'undefined') {
           if (loading) {
-            $noneL.remove();
-          }
-          element.removeClass('ng-hide');
-        } else {
-          if (replace && typeof data !== 'undefined') {
-            element.parent()[0].insertBefore($none[0], element[0]);
-          }
-          if (loading && typeof data === 'undefined') {
             element.parent()[0].insertBefore($noneL[0], element[0]);
           }
-          element.addClass('ng-hide');
+          $none.remove();
+          if (show) { 
+            element.addClass('ng-hide');
+          } else {
+            element.removeClass('ng-hide');
+          }
+
+        // If the data is empty
+        } else if (!data.length) {
+          if (replace) {
+            element.parent()[0].insertBefore($none[0], element[0]);
+          }
+          $noneL.remove();
+          if (show) { 
+            element.addClass('ng-hide');
+          } else {
+            element.removeClass('ng-hide');
+          }
+
+        // If data is fine and dandy
+        } else {
+          $none.remove();
+          $noneL.remove();
+          if (show) { 
+            element.removeClass('ng-hide');
+          } else {
+            element.addClass('ng-hide');
+          }
         }
       });
 

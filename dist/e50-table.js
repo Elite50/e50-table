@@ -317,7 +317,7 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
 
         // If maintaining all data locally
         } else {
-          var localData;
+          var localData = [];
           scope.e50GetData = function() {
             return localData;
           };

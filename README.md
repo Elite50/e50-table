@@ -53,10 +53,10 @@ $scope.myList = [
 
 ##### Result:
 
-|L|R|
-|-|-|
-|A|B|
-|C|D|
+|L |R |
+|--|--|
+|A |B |
+|C |D |
 
 ## Full Documentation
 

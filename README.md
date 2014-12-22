@@ -53,8 +53,8 @@ $scope.myList = [
 
 ##### Result:
 
-| L  | R  |
-| -- | -- |
+| Left | Right  |
+| ---- | ---- |
 | A  | B  |
 | C  | D  |
 

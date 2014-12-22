@@ -38,8 +38,8 @@ $scope.myList = [
 <table e50-table e50-data="myList">
   <thead>
     <tr>
-      <th>L</th>
-      <th>R</th>
+      <th>Left</th>
+      <th>Right</th>
     </tr>
   </thead>
   <tbody>

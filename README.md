@@ -370,7 +370,7 @@ This is useful if you want to have a delete link on your row, or use it as a cal
 $scope.deleteRow = function(row, callback) {
   $http.delete(row.id).success(function() {
     callback(row);
-  }
+  });
 };
 ```
 

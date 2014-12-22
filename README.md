@@ -74,7 +74,9 @@ The Elite50 Table supports many different HTML attributes, allowing for a large 
 
 #### `e50-data="array"`
 
-If provided, creates a two-way binding between a parent scope variable `array` and the table's data set. Expects `array` to be an array (unless `e50-data-prop` is set). Each value in this array will correspond to an item in the scope of a single table row, as the scope variable `t` (unless `e50-data-key` is set). See example above under **Using the directive**.
+If provided, passes in an `array` of static data to populate the table. Each value in the array becomes a separate scope variable `t` for an individual `e50-table-row`.
+
+This creates a two-way binding between the table data and the parent scope variable passed in. The value is expected to be an array unless `e50-data-prop` is set. The row value `t` can can be given a different alias using `e50-data-key`.
 
 #### `e50-data-prop="string"`
 
@@ -164,7 +166,7 @@ This makes the same request as **Example 1**.
 
 #### `e50-fetch-body="object"`
 
-**Requires `e50-fetch`**. Similarly to `e50-fetch-params`, this object is sent as the body of the HTTP request (for appropriate `e50-fetch-method`s that support request bodies). Like for `e50-fetch-params`, a new request will be made every time this object is changed (unless `e50-fetch-once` or `e50-fetch-limit` is set).
+**Requires `e50-fetch`**. Similarly to `e50-fetch-params`, this object is sent as the body of the HTTP request (if the `e50-fetch-method` supports request bodies). Like for `e50-fetch-params`, a new request will be made every time this object is changed (unless `e50-fetch-once` or `e50-fetch-limit` is set).
 
 #### `e50-fetch-once`
 

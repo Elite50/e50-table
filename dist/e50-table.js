@@ -114,7 +114,8 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
           ];
         }, function() {
           // Don't fetch if sorting should be done client-side
-          if (!('e50FetchLimit' in attrs && 'e50FetchLimitProp' in attrs &&
+          if (!hasFetched ||
+              !('e50FetchLimit' in attrs && 'e50FetchLimitProp' in attrs &&
                 scope.e50GetData()[attrs.e50FetchLimitProp] <=
                 attrs.e50FetchLimit)) {
             fetch();

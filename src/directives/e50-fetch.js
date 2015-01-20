@@ -9,6 +9,7 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
       var polling = 'e50Poll' in attrs;
       var infinite = 'e50InfiniteScroll' in attrs;
       var scrollParent = false;
+      var hasFetched = false;
 
       // Get initial params and body
       var params = angular.copy($parse(attrs.e50FetchParams)(scope));
@@ -33,6 +34,7 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
 
       // Fetch the table data
       function fetch(isPoll, isScroll) {
+        console.log('fetching');
         fetching = true;
         params = angular.copy($parse(attrs.e50FetchParams)(scope));
         body = angular.copy($parse(attrs.e50FetchBody)(scope));
@@ -53,7 +55,7 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
             limit = lObj.limit;
           }
         }
-        if ('e50Loading' in attrs && !isPoll && !isScroll) {
+        if ('e50Loading' in attrs && !isPoll && !isScroll && hasFetched) {
           if (attrs.e50Loading !== 'emit') { scope.$broadcast('loading-show', 'e50-table-loading'); }
           if (attrs.e50Loading !== 'broadcast') { scope.$emit('loading-show', 'e50-table-loading'); }
         }
@@ -85,7 +87,7 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
           }
         }).finally(function() {
           fetching = false;
-          if ('e50Loading' in attrs && !isPoll && !isScroll) {
+          if ('e50Loading' in attrs && !isPoll && !isScroll && hasFetched) {
             if (attrs.e50Loading !== 'emit') { scope.$broadcast('loading-hide', 'e50-table-loading'); }
             if (attrs.e50Loading !== 'broadcast') { scope.$emit('loading-hide', 'e50-table-loading'); }
           }
@@ -93,6 +95,7 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
             if (attrs.e50InfiniteLoading !== 'emit') { scope.$broadcast('loading-hide', 'e50-table-infinite-loading'); }
             if (attrs.e50InfiniteLoading !== 'broadcast') { scope.$emit('loading-hide', 'e50-table-infinite-loading'); }
           }
+          hasFetched = true;
         });
       }
 

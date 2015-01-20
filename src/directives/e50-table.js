@@ -51,6 +51,8 @@ angular.module('e50Table').directive('e50Table', function ($parse) {
           scope.e50SetData = function(data) {
             $parse(attrs.e50Data).assign(scope.$parent, data);
           };
+          scope.$on('$destroy', function() {
+          });
 
         // If maintaining all data locally
         } else {
@@ -61,6 +63,8 @@ angular.module('e50Table').directive('e50Table', function ($parse) {
           scope.e50SetData = function(data) {
             localData = data;
           };
+          scope.$on('$destroy', function() {
+          });
         }
 
       };

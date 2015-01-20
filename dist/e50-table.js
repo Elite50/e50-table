@@ -12,6 +12,7 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
       var polling = 'e50Poll' in attrs;
       var infinite = 'e50InfiniteScroll' in attrs;
       var scrollParent = false;
+      var hasFetched = false;
 
       // Get initial params and body
       var params = angular.copy($parse(attrs.e50FetchParams)(scope));
@@ -36,6 +37,7 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
 
       // Fetch the table data
       function fetch(isPoll, isScroll) {
+        console.log('fetching');
         fetching = true;
         params = angular.copy($parse(attrs.e50FetchParams)(scope));
         body = angular.copy($parse(attrs.e50FetchBody)(scope));
@@ -56,7 +58,7 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
             limit = lObj.limit;
           }
         }
-        if ('e50Loading' in attrs && !isPoll && !isScroll) {
+        if ('e50Loading' in attrs && !isPoll && !isScroll && hasFetched) {
           if (attrs.e50Loading !== 'emit') { scope.$broadcast('loading-show', 'e50-table-loading'); }
           if (attrs.e50Loading !== 'broadcast') { scope.$emit('loading-show', 'e50-table-loading'); }
         }
@@ -88,7 +90,7 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
           }
         }).finally(function() {
           fetching = false;
-          if ('e50Loading' in attrs && !isPoll && !isScroll) {
+          if ('e50Loading' in attrs && !isPoll && !isScroll && hasFetched) {
             if (attrs.e50Loading !== 'emit') { scope.$broadcast('loading-hide', 'e50-table-loading'); }
             if (attrs.e50Loading !== 'broadcast') { scope.$emit('loading-hide', 'e50-table-loading'); }
           }
@@ -96,6 +98,7 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
             if (attrs.e50InfiniteLoading !== 'emit') { scope.$broadcast('loading-hide', 'e50-table-infinite-loading'); }
             if (attrs.e50InfiniteLoading !== 'broadcast') { scope.$emit('loading-hide', 'e50-table-infinite-loading'); }
           }
+          hasFetched = true;
         });
       }
 
@@ -319,6 +322,8 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
           scope.e50SetData = function(data) {
             $parse(attrs.e50Data).assign(scope.$parent, data);
           };
+          scope.$on('$destroy', function() {
+          });
 
         // If maintaining all data locally
         } else {
@@ -329,6 +334,8 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
           scope.e50SetData = function(data) {
             localData = data;
           };
+          scope.$on('$destroy', function() {
+          });
         }
 
       };
@@ -361,20 +368,31 @@ angular.module('e50Table').factory('Poll', ["$timeout", function($timeout) {
   function Poll(callback, delay) {
     this.delay = delay ? delay : 1000;
     this.callback = callback;
-    this.poll();
     this.canceled = false;
+    this.wait();
   }
 
   // Continually run the callback function
   Poll.prototype.poll = function() {
     var that = this;
-    this.callback().finally(function() {
-      if (!that.canceled) {
-        that.timeout = $timeout(function() {
-          that.poll();
-        }, that.delay);
-      }
-    });
+    // Fetch only if the document has focus
+    if (document.hasFocus()) {
+      this.callback().finally(function() {
+        if (!that.canceled) {
+          that.wait();
+        }
+      });
+    } else {
+      this.wait();
+    }
+  };
+
+  // Run the polling function after a timeout
+  Poll.prototype.wait = function() {
+    var that = this;
+    this.timeout = $timeout(function() {
+      that.poll();
+    }, this.delay);
   };
 
   // Stop polling

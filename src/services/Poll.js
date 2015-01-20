@@ -4,20 +4,31 @@ angular.module('e50Table').factory('Poll', function($timeout) {
   function Poll(callback, delay) {
     this.delay = delay ? delay : 1000;
     this.callback = callback;
-    this.poll();
     this.canceled = false;
+    this.wait();
   }
 
   // Continually run the callback function
   Poll.prototype.poll = function() {
     var that = this;
-    this.callback().finally(function() {
-      if (!that.canceled) {
-        that.timeout = $timeout(function() {
-          that.poll();
-        }, that.delay);
-      }
-    });
+    // Fetch only if the document has focus
+    if (document.hasFocus()) {
+      this.callback().finally(function() {
+        if (!that.canceled) {
+          that.wait();
+        }
+      });
+    } else {
+      this.wait();
+    }
+  };
+
+  // Run the polling function after a timeout
+  Poll.prototype.wait = function() {
+    var that = this;
+    this.timeout = $timeout(function() {
+      that.poll();
+    }, this.delay);
   };
 
   // Stop polling

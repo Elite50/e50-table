@@ -34,7 +34,6 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
 
       // Fetch the table data
       function fetch(isPoll, isScroll) {
-        console.log('fetching');
         fetching = true;
         params = angular.copy($parse(attrs.e50FetchParams)(scope));
         body = angular.copy($parse(attrs.e50FetchBody)(scope));

@@ -20,8 +20,8 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
         // Get initial limit and offset
         var offsetKey = 'e50OffsetKey' in attrs ? attrs.e50OffsetKey : 'offset';
         var limitKey = 'e50LimitKey' in attrs ? attrs.e50LimitKey : 'limit';
-        var offset = params && offsetKey in params ? params.offset : body.offset;
-        var limit = params && limitKey in params ? params.limit : body.limit;
+        var offset = params && offsetKey in params ? params[offsetKey] : body[offsetKey];
+        var limit = params && limitKey in params ? params[limitKey] : body[limitKey];
         var initialLimit = limit;
       }
 
@@ -43,15 +43,15 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
           var lObj = (params && limitKey in params) ? params : body;
           // If it's a non-polling infinite scroll, fetch the next several rows
           if (isScroll && !polling) {
-            oObj.offset = offset;
+            oObj[offsetKey] = offset;
             append = true;
           // If it's a polling poll or scroll, fetch all with the increased limit
           } else if (polling && (isPoll || isScroll)) {
-            lObj.limit = limit;
+            lObj[limitKey] = limit;
           // Otherwise, reset everything because some other parameter has changed
           } else {
-            offset = oObj.offset;
-            limit = lObj.limit;
+            offset = oObj[offsetKey];
+            limit = lObj[limitKey];
           }
         }
         if ('e50Loading' in attrs && !isPoll && !isScroll && hasFetched) {

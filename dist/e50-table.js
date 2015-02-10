@@ -216,7 +216,6 @@ angular.module('e50Table').directive('e50IfData', function () {
 
       function allDeleted(data) {
         for (var i = 0; i < data.length; i++) {
-          console.log(scope.e50Deleted);
           if (scope.e50Deleted.indexOf(data[i].id) === -1) {
             return false;
           }

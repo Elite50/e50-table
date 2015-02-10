@@ -19,11 +19,11 @@ angular.module('e50Table').directive('e50Table', function ($parse) {
       });
 
       return function(scope, element, attrs) {
-        var deleted = [];
+        scope.e50Deleted = [];
 
         // Create filtering function
         scope.e50Filter = function(d) {
-          if (deleted.indexOf(d.id) >= 0) { return false; }
+          if (scope.e50Deleted.indexOf(d.id) >= 0) { return false; }
           if ('e50Filter' in attrs) {
             return $parse(attrs.e50Filter)(scope)(d);
           }
@@ -32,7 +32,7 @@ angular.module('e50Table').directive('e50Table', function ($parse) {
 
         // Create delete row function
         scope.e50DeleteRow = function(t) {
-          deleted.push(t.id);
+          scope.e50Deleted.push(t.id);
         };
 
         // Observe sorting attributes for interpolated changes

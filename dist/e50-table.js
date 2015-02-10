@@ -216,7 +216,7 @@ angular.module('e50Table').directive('e50IfData', function () {
 
       function allDeleted(data) {
         for (var i = 0; i < data.length; i++) {
-          if (scope.e50Deleted.indexOf(data[i].id) === -1) {
+          if (scope.e50Filter(data[i])) {
             return false;
           }
         }
@@ -224,8 +224,8 @@ angular.module('e50Table').directive('e50IfData', function () {
       }
 
       // Hide & show the element based on data status
-      scope.$watch('e50GetData()', function(v) {
-        var data = 'e50DataProp' in ctrl.$attrs ? v[ctrl.$attrs.e50DataProp] : v;
+      scope.$watch('[e50GetData(), e50Deleted]', function(v) {
+        var data = 'e50DataProp' in ctrl.$attrs ? v[0][ctrl.$attrs.e50DataProp] : v[0];
 
         // If nothing has ever been successfully fetched
         if (typeof data === 'undefined') {

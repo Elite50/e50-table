@@ -205,7 +205,7 @@ angular.module('e50Table').directive('e50IfData', function () {
   return {
     restrict: 'A',
     require: '^e50Table',
-    link: function (scope, element, attrs, ctrl) {
+    link: function (scope, element, attrs) {
 
       var show = attrs.e50IfData !== 'false';
       var replace = attrs.e50IfNoData ? attrs.e50IfNoData : null;
@@ -214,18 +214,8 @@ angular.module('e50Table').directive('e50IfData', function () {
         (attrs.e50IfLoadingData.length ? attrs.e50IfLoadingData : 'Loading data') : null;
       var $noneL = angular.element('<div class="e50-no-data">'+loading+'</div>');
 
-      function allDeleted(data) {
-        for (var i = 0; i < data.length; i++) {
-          if (scope.e50Filter(data[i])) {
-            return false;
-          }
-        }
-        return true;
-      }
-
       // Hide & show the element based on data status
-      scope.$watch('[e50GetData(), e50Deleted]', function(v) {
-        var data = 'e50DataProp' in ctrl.$attrs ? v[0][ctrl.$attrs.e50DataProp] : v[0];
+      scope.$watchCollection('e50FilteredData', function(data) {
 
         // If nothing has ever been successfully fetched
         if (typeof data === 'undefined') {
@@ -240,7 +230,7 @@ angular.module('e50Table').directive('e50IfData', function () {
           }
 
         // If the data is empty
-        } else if (!data.length || allDeleted(data)) {
+        } else if (!data.length) {
           if (replace) {
             element.parent()[0].insertBefore($none[0], element[0]);
           }
@@ -261,7 +251,7 @@ angular.module('e50Table').directive('e50IfData', function () {
             element.addClass('ng-hide');
           }
         }
-      }, true);
+      });
 
     }
   };
@@ -294,16 +284,16 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
         var rpt = document.createAttribute('ng-repeat');
         var key = 'e50DataKey' in tAttrs ? tAttrs.e50DataKey : 't';
         var prop = 'e50DataProp' in tAttrs ? '.' + tAttrs.e50DataProp : '';
-        rpt.value = key + ' in e50GetData()' + prop + ' | orderBy : e50Sort : e50SortReverse | filter : e50Filter';
+        rpt.value = key + ' in e50FilteredData = (e50GetData()' + prop + ' | orderBy : e50Sort : e50SortReverse | filter : e50Filter)';
         row.attributes.setNamedItem(rpt);
       });
 
       return function(scope, element, attrs) {
-        scope.e50Deleted = [];
+        var deleted = [];
 
         // Create filtering function
         scope.e50Filter = function(d) {
-          if (scope.e50Deleted.indexOf(d.id) >= 0) { return false; }
+          if (deleted.indexOf(d.id) >= 0) { return false; }
           if ('e50Filter' in attrs) {
             return $parse(attrs.e50Filter)(scope)(d);
           }
@@ -312,7 +302,7 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
 
         // Create delete row function
         scope.e50DeleteRow = function(t) {
-          scope.e50Deleted.push(t.id);
+          deleted.push(t.id);
         };
 
         // Observe sorting attributes for interpolated changes

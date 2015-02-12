@@ -2,7 +2,7 @@ angular.module('e50Table').directive('e50IfData', function () {
   return {
     restrict: 'A',
     require: '^e50Table',
-    link: function (scope, element, attrs, ctrl) {
+    link: function (scope, element, attrs) {
 
       var show = attrs.e50IfData !== 'false';
       var replace = attrs.e50IfNoData ? attrs.e50IfNoData : null;
@@ -11,18 +11,8 @@ angular.module('e50Table').directive('e50IfData', function () {
         (attrs.e50IfLoadingData.length ? attrs.e50IfLoadingData : 'Loading data') : null;
       var $noneL = angular.element('<div class="e50-no-data">'+loading+'</div>');
 
-      function allDeleted(data) {
-        for (var i = 0; i < data.length; i++) {
-          if (scope.e50Filter(data[i])) {
-            return false;
-          }
-        }
-        return true;
-      }
-
       // Hide & show the element based on data status
-      scope.$watch('[e50GetData(), e50Deleted]', function(v) {
-        var data = 'e50DataProp' in ctrl.$attrs ? v[0][ctrl.$attrs.e50DataProp] : v[0];
+      scope.$watchCollection('e50FilteredData', function(data) {
 
         // If nothing has ever been successfully fetched
         if (typeof data === 'undefined') {
@@ -37,7 +27,7 @@ angular.module('e50Table').directive('e50IfData', function () {
           }
 
         // If the data is empty
-        } else if (!data.length || allDeleted(data)) {
+        } else if (!data.length) {
           if (replace) {
             element.parent()[0].insertBefore($none[0], element[0]);
           }
@@ -58,7 +48,7 @@ angular.module('e50Table').directive('e50IfData', function () {
             element.addClass('ng-hide');
           }
         }
-      }, true);
+      });
 
     }
   };

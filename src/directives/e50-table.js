@@ -14,16 +14,16 @@ angular.module('e50Table').directive('e50Table', function ($parse) {
         var rpt = document.createAttribute('ng-repeat');
         var key = 'e50DataKey' in tAttrs ? tAttrs.e50DataKey : 't';
         var prop = 'e50DataProp' in tAttrs ? '.' + tAttrs.e50DataProp : '';
-        rpt.value = key + ' in e50GetData()' + prop + ' | orderBy : e50Sort : e50SortReverse | filter : e50Filter';
+        rpt.value = key + ' in e50FilteredData = (e50GetData()' + prop + ' | orderBy : e50Sort : e50SortReverse | filter : e50Filter)';
         row.attributes.setNamedItem(rpt);
       });
 
       return function(scope, element, attrs) {
-        scope.e50Deleted = [];
+        var deleted = [];
 
         // Create filtering function
         scope.e50Filter = function(d) {
-          if (scope.e50Deleted.indexOf(d.id) >= 0) { return false; }
+          if (deleted.indexOf(d.id) >= 0) { return false; }
           if ('e50Filter' in attrs) {
             return $parse(attrs.e50Filter)(scope)(d);
           }
@@ -32,7 +32,7 @@ angular.module('e50Table').directive('e50Table', function ($parse) {
 
         // Create delete row function
         scope.e50DeleteRow = function(t) {
-          scope.e50Deleted.push(t.id);
+          deleted.push(t.id);
         };
 
         // Observe sorting attributes for interpolated changes

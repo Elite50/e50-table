@@ -20,6 +20,7 @@ angular.module('e50Table').directive('e50Table', function ($parse) {
 
       return function(scope, element, attrs) {
         var deleted = [];
+        var sortLocked = false;
 
         // Create filtering function
         scope.e50Filter = function(d) {
@@ -37,10 +38,32 @@ angular.module('e50Table').directive('e50Table', function ($parse) {
 
         // Observe sorting attributes for interpolated changes
         attrs.$observe('e50Sort', function(v) {
-          scope.e50Sort = v;
+          if (!sortLocked) {
+            scope.e50Sort = v;
+          }
         });
         attrs.$observe('e50SortReverse', function(v) {
-          scope.e50SortReverse = v;
+          if (!sortLocked) {
+            scope.e50SortReverse = v;
+          }
+        });
+
+        // Allow locking the sorting in a particular way dynamically
+        scope.$watch(function() {
+          return $parse(attrs.e50SortLock)(scope);
+        }, function(v) {
+          if (v) {
+            sortLocked = true;
+            for (var i = 0; i < scope.e50FilteredData.length; i++) {
+              scope.e50FilteredData[i].e50SortLockIndex = i;
+            }
+            scope.e50Sort = 'e50SortLockIndex';
+            scope.e50SortReverse = false;
+          } else {
+            sortLocked = false;
+            scope.e50Sort = attrs.e50Sort;
+            scope.e50SortReverse = attrs.e50SortReverse;
+          }
         });
 
         // If using an external data array

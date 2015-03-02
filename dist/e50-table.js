@@ -308,15 +308,16 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
           deleted.push(t.id);
         };
 
-        // Observe sorting attributes for interpolated changes
-        attrs.$observe('e50Sort', function(v) {
+        // Watch sorting attributes for changes
+        scope.$watchCollection(function() {
+          return [
+            $parse(attrs.e50Sort)(scope),
+            $parse(attrs.e50SortReverse)(scope)
+          ];
+        }, function(v) {
           if (!sortLocked) {
-            scope.e50Sort = v;
-          }
-        });
-        attrs.$observe('e50SortReverse', function(v) {
-          if (!sortLocked) {
-            scope.e50SortReverse = v;
+            scope.e50Sort = v[0];
+            scope.e50SortReverse = v[1];
           }
         });
 

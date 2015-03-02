@@ -309,7 +309,7 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
         };
 
         // Watch sorting attributes for changes
-        scope.$watchCollection(function() {
+        scope.$watch(function() {
           return [
             $parse(attrs.e50Sort)(scope),
             $parse(attrs.e50SortReverse)(scope)
@@ -319,7 +319,7 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
             scope.e50Sort = v[0];
             scope.e50SortReverse = v[1];
           }
-        });
+        }, true);
 
         // Allow locking the sorting in a particular way dynamically
         scope.$watch(function() {
@@ -334,8 +334,8 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
             scope.e50SortReverse = false;
           } else {
             sortLocked = false;
-            scope.e50Sort = attrs.e50Sort;
-            scope.e50SortReverse = attrs.e50SortReverse;
+            scope.e50Sort = $parse(attrs.e50Sort)(scope);
+            scope.e50SortReverse = $parse(attrs.e50SortReverse)(scope);
           }
         });
 

@@ -10,6 +10,7 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
       var infinite = 'e50InfiniteScroll' in attrs;
       var scrollParent = false;
       var hasFetched = false;
+      var fetchNum = 0;
 
       // Get initial params and body
       var params = angular.copy($parse(attrs.e50FetchParams)(scope));
@@ -62,7 +63,17 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
           if (attrs.e50InfiniteLoading !== 'emit') { scope.$broadcast('loading-show', 'e50-table-infinite-loading'); }
           if (attrs.e50InfiniteLoading !== 'broadcast') { scope.$emit('loading-show', 'e50-table-infinite-loading'); }
         }
+        // If it's not a poll, increment the fetchNum counter
+        var curFetchNum = fetchNum;
+        if (!isPoll) {
+          fetchNum++;
+          curFetchNum = fetchNum;
+        }
         return fetchResource.fetch(params,body).$promise.then(function(response) {
+          // The params have been changed, don't use this request
+          if (curFetchNum !== fetchNum) {
+            return;
+          }
           // If the data has changed
           if (!angular.equals(scope.e50GetData(),response.data)) {
             hasMore = true;

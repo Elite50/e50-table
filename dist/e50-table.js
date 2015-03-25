@@ -156,7 +156,7 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
             var lasts = element[0].querySelectorAll('[e50-table-row]:last-child');
             angular.forEach(lasts, function(last) {
               if (last.offsetHeight && last.offsetTop < scrollParent[0].scrollTop +
-                  scrollParent[0].offsetHeight + last.offsetHeight && !fetching && hasMore) {
+                  scrollParent[0].offsetHeight + 2*last.offsetHeight && !fetching && hasMore) {
                 // If polling, just up the total limit
                 if (polling) {
                   limit += initialLimit;
@@ -379,7 +379,7 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
   };
 }]);
 
-angular.module('e50Table').directive('e50View', function () {
+angular.module('e50Table').directive('e50View', ["$timeout", function ($timeout) {
   return {
     restrict: 'A',
     require: '^e50Table',
@@ -389,7 +389,9 @@ angular.module('e50Table').directive('e50View', function () {
       ctrl.$attrs.$observe('e50Views', function(v) {
         if (v === attrs.e50View) {
           element.removeClass('ng-hide');
-          scope.e50InfiniteScroll(true);
+          $timeout(function() {
+            scope.e50InfiniteScroll(true);
+          });
         } else {
           element.addClass('ng-hide');
         }
@@ -397,7 +399,7 @@ angular.module('e50Table').directive('e50View', function () {
 
     }
   };
-});
+}]);
 
 angular.module('e50Table').factory('Poll', ["$timeout", function($timeout) {
 

@@ -153,7 +153,7 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
             var lasts = element[0].querySelectorAll('[e50-table-row]:last-child');
             angular.forEach(lasts, function(last) {
               if (last.offsetHeight && last.offsetTop < scrollParent[0].scrollTop +
-                  scrollParent[0].offsetHeight + last.offsetHeight && !fetching && hasMore) {
+                  scrollParent[0].offsetHeight + 2*last.offsetHeight && !fetching && hasMore) {
                 // If polling, just up the total limit
                 if (polling) {
                   limit += initialLimit;

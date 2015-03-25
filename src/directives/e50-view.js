@@ -1,4 +1,4 @@
-angular.module('e50Table').directive('e50View', function () {
+angular.module('e50Table').directive('e50View', function ($timeout) {
   return {
     restrict: 'A',
     require: '^e50Table',
@@ -8,7 +8,9 @@ angular.module('e50Table').directive('e50View', function () {
       ctrl.$attrs.$observe('e50Views', function(v) {
         if (v === attrs.e50View) {
           element.removeClass('ng-hide');
-          scope.e50InfiniteScroll(true);
+          $timeout(function() {
+            scope.e50InfiniteScroll(true);
+          });
         } else {
           element.addClass('ng-hide');
         }

@@ -297,7 +297,7 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
         var rpt = document.createAttribute('ng-repeat');
         var key = 'e50DataKey' in tAttrs ? tAttrs.e50DataKey : 't';
         var prop = 'e50DataProp' in tAttrs ? '.' + tAttrs.e50DataProp : '';
-        rpt.value = key + ' in e50FilteredData = (e50GetData()' + prop + ' | orderBy : e50Sort : e50SortReverse | filter : e50Filter)';
+        rpt.value = key + ' in e50FilteredData = (e50GetData()' + prop + ' | orderBy : e50Sort : e50SortReverse | filter : e50Filter) track by $index';
         row.attributes.setNamedItem(rpt);
       });
 
@@ -307,7 +307,7 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
 
         // Create filtering function
         scope.e50Filter = function(d) {
-          if (deleted.indexOf(d.id) >= 0) { return false; }
+          if (d && 'id' in d && deleted.indexOf(d.id) >= 0) { return false; }
           if ('e50Filter' in attrs) {
             return $parse(attrs.e50Filter)(scope)(d);
           }

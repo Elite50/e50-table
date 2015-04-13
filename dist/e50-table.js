@@ -239,9 +239,9 @@ angular.module('e50Table').directive('e50IfData', function () {
           }
           $none.remove();
           if (show) {
-            element.addClass('ng-hide');
+            element.css('display', 'none');
           } else {
-            element.removeClass('ng-hide');
+            element.css('display', '');
           }
 
         // If the data is empty
@@ -251,9 +251,9 @@ angular.module('e50Table').directive('e50IfData', function () {
           }
           $noneL.remove();
           if (show) {
-            element.addClass('ng-hide');
+            element.css('display', 'none');
           } else {
-            element.removeClass('ng-hide');
+            element.css('display', '');
           }
 
         // If data is fine and dandy
@@ -261,9 +261,9 @@ angular.module('e50Table').directive('e50IfData', function () {
           $none.remove();
           $noneL.remove();
           if (show) {
-            element.removeClass('ng-hide');
+            element.css('display', '');
           } else {
-            element.addClass('ng-hide');
+            element.css('display', 'none');
           }
         }
       });

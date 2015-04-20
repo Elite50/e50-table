@@ -72,33 +72,41 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
           fetchNum++;
           curFetchNum = fetchNum;
         }
-        return fetchResource.fetch(params,body).$promise.then(function(response) {
-          // The params have been changed, don't use this request
-          if (curFetchNum !== fetchNum) {
-            return;
-          }
-          // If the data has changed
-          if (!angular.equals(scope.e50GetData(),response.data)) {
-            hasMore = true;
-            // If appending
-            if (append) {
-              var args = response.data;
-              var array = scope.e50GetData();
-              if ('e50DataProp' in attrs) {
-                args = args[attrs.e50DataProp];
-                array = array[attrs.e50DataProp];
-              }
-              if (!args.length) { hasMore = false; }
-              Array.prototype.push.apply(array, args);
-            // If replacing
-            } else {
-              scope.e50SetData(response.data);
+        return fetchResource.fetch(params,body).$promise.then(
+          function(response) {
+            // The params have been changed, don't use this request
+            if (curFetchNum !== fetchNum) {
+              return;
             }
-            $timeout(scope.e50InfiniteScroll);
-          } else if (isScroll) {
-            hasMore = false;
+            // If the data has changed
+            if (!angular.equals(scope.e50GetData(),response.data)) {
+              hasMore = true;
+              // If appending
+              if (append) {
+                var args = response.data;
+                var array = scope.e50GetData();
+                if ('e50DataProp' in attrs) {
+                  args = args[attrs.e50DataProp];
+                  array = array[attrs.e50DataProp];
+                }
+                if (!args.length) { hasMore = false; }
+                Array.prototype.push.apply(array, args);
+              // If replacing
+              } else {
+                scope.e50SetData(response.data);
+              }
+              $timeout(scope.e50InfiniteScroll);
+            } else if (isScroll) {
+              hasMore = false;
+            }
+          },
+          function(response) {
+            // Optional error handling
+            if ('e50IfError' in attrs) {
+              $parse(attrs.e50IfError)(scope)(response);
+            }
           }
-        }).finally(function() {
+        ).finally(function() {
           fetching = false;
           if ('e50Loading' in attrs && !isPoll && !isScroll && hasFetched) {
             if (attrs.e50Loading !== 'emit') { scope.$broadcast('loading-hide', 'e50-table-loading'); }

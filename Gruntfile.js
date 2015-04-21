@@ -27,12 +27,20 @@ module.exports = function(grunt) {
         files: ['demo/*.css', 'src/**/*.js', 'demo/*.html', 'demo/*.js', 'Gruntfile.js'],
         tasks: ['default']
       }
+    },
+    bump: {
+      options: {
+        files: ['package.json', 'bower.json'],
+        commitFiles: ['-a'],
+        pushTo: 'origin'
+      }
     }
   });
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-ng-annotate');
+  grunt.loadNpmTasks('grunt-bump');
 
   grunt.registerTask('default', [
     'ngAnnotate',

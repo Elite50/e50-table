@@ -1,6 +1,6 @@
 {
   "name": "e50-table",
-  "version": "0.0.1",
+  "version": "2.2.1",
   "description": "Elite50 AngularJS Table Directive",
   "repository": "GITHUB REPOSITORY",
   "main": "dist/e50-table.js",
@@ -16,5 +16,8 @@
     "grunt-ng-annotate": "latest",
     "grunt-contrib-uglify": "latest",
     "grunt-contrib-watch": "latest"
+  },
+  "dependencies": {
+    "grunt-bump": "^0.3.0"
   }
 }

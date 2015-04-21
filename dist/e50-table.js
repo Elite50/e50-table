@@ -315,6 +315,14 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
         var deleted = [];
         var sortLocked = false;
 
+        function getDataArrayIndex(v) {
+          var data = scope.e50GetData();
+          if ('e50DataProp' in attrs) {
+            data = data[attrs.e50DataProp];
+          }
+          return data.indexOf(v);
+        }
+
         // Create filtering function
         scope.e50Filter = function(d) {
           if (d && 'id' in d && deleted.indexOf(d.id) >= 0) { return false; }
@@ -337,8 +345,8 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
           ];
         }, function(v) {
           if (!sortLocked) {
-            scope.e50Sort = v[0];
-            scope.e50SortReverse = v[1];
+            scope.e50Sort = v[0] ? v[0] : getDataArrayIndex;
+            scope.e50SortReverse = v[1] ? true : false;
           }
         }, true);
 
@@ -355,8 +363,9 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
             scope.e50SortReverse = false;
           } else {
             sortLocked = false;
-            scope.e50Sort = $parse(attrs.e50Sort)(scope);
-            scope.e50SortReverse = $parse(attrs.e50SortReverse)(scope);
+            var sort = $parse(attrs.e50Sort)(scope);
+            scope.e50Sort = sort ? sort : getDataArrayIndex;
+            scope.e50SortReverse = $parse(attrs.e50SortReverse)(scope) ? true : false;
           }
         });
 

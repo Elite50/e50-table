@@ -39,6 +39,10 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
         params = angular.copy($parse(attrs.e50FetchParams)(scope));
         body = angular.copy($parse(attrs.e50FetchBody)(scope));
         var append = false;
+        // Force the empty loader to work right
+        if (!isPoll && scope.e50FilteredData && !scope.e50FilteredData.length) {
+          scope.e50SetData(undefined);
+        }
         if (infinite) {
           var oObj = (params && offsetKey in params) ? params : body;
           var lObj = (params && limitKey in params) ? params : body;

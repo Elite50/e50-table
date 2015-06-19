@@ -14,7 +14,8 @@ angular.module('e50Table').directive('e50Table', function ($parse) {
         var rpt = document.createAttribute('ng-repeat');
         var key = 'e50DataKey' in tAttrs ? tAttrs.e50DataKey : 't';
         var prop = 'e50DataProp' in tAttrs ? '.' + tAttrs.e50DataProp : '';
-        rpt.value = key + ' in e50FilteredData = (e50GetData()' + prop + ' | orderBy : e50Sort : e50SortReverse | filter : e50Filter)';
+        rpt.value = key + ' in e50FilteredData = (e50GetData()' + prop +
+            ' | orderBy : e50Sort : e50SortReverse | filter : e50Filter) track by $index';
         row.attributes.setNamedItem(rpt);
       });
 
@@ -82,7 +83,7 @@ angular.module('e50Table').directive('e50Table', function ($parse) {
             return $parse(attrs.e50Data)(scope);
           };
           scope.e50SetData = function(data) {
-            $parse(attrs.e50Data).assign(scope.$parent, data);
+            smartUpdate($parse(attrs.e50Data)(scope), data, false);
           };
           scope.$on('$destroy', function() {
           });
@@ -94,10 +95,42 @@ angular.module('e50Table').directive('e50Table', function ($parse) {
             return localData;
           };
           scope.e50SetData = function(data) {
-            localData = data;
+            smartUpdate(localData, data, true);
           };
           scope.$on('$destroy', function() {
           });
+        }
+
+        function smartUpdate(oldData, newData, local) {
+          var oldDataList = oldData;
+          var newDataList = newData;
+          if ('e50DataProp' in attrs) {
+            oldDataList = oldData[attrs.e50DataProp] ? oldData[attrs.e50DataProp] : [];
+            newDataList = newData[attrs.e50DataProp] ? newData[attrs.e50DataProp] : [];
+          }
+          // If it's empty, just assign
+          if (!oldDataList.length) {
+            if (local) {
+              localData = newData;
+            } else {
+              $parse(attrs.e50Data).assign(scope.$parent, newData);
+            }
+          }
+          for (var i = 0, done = false; !done; i++) {
+            if (i === oldDataList.length) {
+              // If the old list has run out
+              done = true;
+              Array.prototype.push.apply(oldDataList, newDataList.slice(i, newDataList.length));
+            } else if (i === newDataList.length) {
+              // If the new list has run out
+              done = true;
+              oldDataList.splice(i, oldDataList.length - i);
+            } else {
+              if (!angular.equals(oldDataList[i], newDataList[i])) {
+                oldDataList[i] = newDataList[i];
+              }
+            }
+          }
         }
 
       };

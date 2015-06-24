@@ -404,6 +404,12 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
           if ('e50DataProp' in attrs) {
             oldDataList = oldData[attrs.e50DataProp] ? oldData[attrs.e50DataProp] : [];
             newDataList = newData[attrs.e50DataProp] ? newData[attrs.e50DataProp] : [];
+            // Update any non-list properties
+            for (var p in oldData) {
+              if (p !== attrs.e50DataProp && !angular.equals(oldData[p], newData[p])) {
+                oldData[p] = newData[p];
+              }
+            }
           }
           // If it's empty, just assign
           if (!oldDataList.length) {

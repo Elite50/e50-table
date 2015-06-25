@@ -15,7 +15,7 @@ angular.module('e50Table').directive('e50Table', function ($parse) {
         var key = 'e50DataKey' in tAttrs ? tAttrs.e50DataKey : 't';
         var prop = 'e50DataProp' in tAttrs ? '.' + tAttrs.e50DataProp : '';
         rpt.value = key + ' in e50FilteredData = (e50GetData()' + prop +
-            ' | orderBy : e50Sort : e50SortReverse | filter : e50Filter) track by $index';
+            ' | orderBy : e50Sort : e50SortReverse | filter : e50Filter)';
         row.attributes.setNamedItem(rpt);
       });
 

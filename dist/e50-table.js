@@ -7,13 +7,13 @@ angular.module('e50Table').directive('e50DragHandle', function () {
     require: '^e50Drag',
     link: function postLink(scope, element, attrs, ctrl) {
 
-      var $drag, diffTop, diffLeft;
+      var $drag, diffTop, diffLeft, iTop, iLeft;
 
       element.on('mousedown', function(event) {
-        var dragTop = ctrl.$element[0].getBoundingClientRect().top;
-        var dragLeft = ctrl.$element[0].getBoundingClientRect().left;
-        diffTop = event.clientY - dragTop;
-        diffLeft = event.clientX - dragLeft;
+        iTop = ctrl.$element[0].getBoundingClientRect().top;
+        iLeft = ctrl.$element[0].getBoundingClientRect().left;
+        diffTop = event.clientY - iTop;
+        diffLeft = event.clientX - iLeft;
         ctrl.$element.css({
           opacity: 0.2
         });
@@ -21,22 +21,20 @@ angular.module('e50Table').directive('e50DragHandle', function () {
           position: 'absolute',
           width: ctrl.$element[0].clientWidth,
           height: ctrl.$element[0].clientHeight,
-          top: dragTop,
-          left: dragLeft,
+          top: iTop,
+          left: iLeft,
           border: '2px dashed #999',
           zIndex: 10000000
         });
         angular.element('body').append($drag).css({
           userSelect: 'none'
         }).on('mouseleave mousemove', function(event) {
-          var css = {};
-          if (!('e50DragX' in ctrl.$attrs)) {
-            css.top = event.clientY - diffTop;
-          }
-          if (!('e50DragY' in ctrl.$attrs)) {
-            css.left = event.clientX - diffLeft;
-          }
-          $drag.css(css);
+          $drag.css({
+            top: 'e50DragX' in ctrl.$attrs ?
+              gravity(iTop, event.clientY - diffTop) : event.clientY - diffTop,
+            left: 'e50DragY' in ctrl.$attrs ?
+              gravity(iLeft, event.clientX - diffLeft) : event.clientX - diffLeft
+          });
         }).on('mouseup', function() {
           $drag.remove();
           ctrl.$element.css({
@@ -47,6 +45,17 @@ angular.module('e50Table').directive('e50DragHandle', function () {
           }).off('mousemove');
         });
       });
+
+      function gravity(earth, moon) {
+        if ('e50DragGravity' in ctrl.$attrs) {
+          var r = ctrl.$attrs.e50DragGravity || 0;
+          var dist = Math.abs(moon - earth);
+          var pull = dist > r ? Math.round(Math.sqrt(dist - r)) + r : dist;
+          return earth + (earth < moon ? 1 : -1) * pull;
+        } else {
+          return earth;
+        }
+      }
 
     }
   };

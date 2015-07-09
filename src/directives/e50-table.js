@@ -101,10 +101,23 @@ angular.module('e50Table').directive('e50Table', function ($parse) {
           });
         }
 
+        function applyData(newData, local) {
+            if (local) {
+              localData = newData;
+            } else {
+              $parse(attrs.e50Data).assign(scope.$parent, newData);
+            }
+        }
+
         function smartUpdate(oldData, newData, local) {
+          // If anything is undefined, just assign
+          if (typeof oldData === 'undefined' || typeof newData === 'undefined') {
+            return applyData(newData, local);
+          }
+          // Determine the actual lists
           var oldDataList = oldData;
           var newDataList = newData;
-          if ('e50DataProp' in attrs) {
+          if ('e50DataProp' in attrs && typeof newData !== 'undefined') {
             oldDataList = oldData[attrs.e50DataProp] ? oldData[attrs.e50DataProp] : [];
             newDataList = newData[attrs.e50DataProp] ? newData[attrs.e50DataProp] : [];
             // Update any non-list properties
@@ -114,14 +127,11 @@ angular.module('e50Table').directive('e50Table', function ($parse) {
               }
             }
           }
-          // If it's empty, just assign
+          // If old list is empty, just assign
           if (!oldDataList.length) {
-            if (local) {
-              localData = newData;
-            } else {
-              $parse(attrs.e50Data).assign(scope.$parent, newData);
-            }
+            return applyData(newData, local);
           }
+          // Otherwise, do the smart update
           for (var i = 0, done = false; !done; i++) {
             if (i === oldDataList.length) {
               // If the old list has run out

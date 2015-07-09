@@ -65,9 +65,9 @@ angular.module('e50Table').directive('e50Table', function ($parse) {
           if (v) {
             sortLocked = true;
             for (var i = 0; i < scope.e50FilteredData.length; i++) {
-              scope.e50FilteredData[i].e50SortLockIndex = i;
+              scope.e50FilteredData[i].$$e50SortLockIndex = i;
             }
-            scope.e50Sort = 'e50SortLockIndex';
+            scope.e50Sort = '$$e50SortLockIndex';
             scope.e50SortReverse = false;
           } else {
             sortLocked = false;

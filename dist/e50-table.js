@@ -4,67 +4,17 @@ angular.module('e50Table', ['ngResource']);
 angular.module('e50Table').directive('e50DragHandle', function () {
   return {
     restrict: 'A',
-    require: '^e50Drag',
-    link: function postLink(scope, element, attrs, ctrl) {
+    link: function postLink(scope, element) {
 
-      var $drag, diffTop, diffLeft, iTop, iLeft;
+      // Add appropriate styles to handle
+      element.css({
+        cursor: 'move'
+      });
 
       // Listen for the start of dragging
       element.on('mousedown', function(event) {
-        iTop = ctrl.$element[0].getBoundingClientRect().top;
-        iLeft = ctrl.$element[0].getBoundingClientRect().left;
-        diffTop = event.clientY - iTop;
-        diffLeft = event.clientX - iLeft;
-
-        // Set the underlying element style
-        ctrl.$element.css({
-          opacity: 0.2
-        });
-
-        // Create the dragging border element
-        $drag = angular.element('<div></div>').css({
-          position: 'absolute',
-          width: ctrl.$element[0].clientWidth,
-          height: ctrl.$element[0].clientHeight,
-          top: iTop,
-          left: iLeft,
-          border: '2px dashed #999',
-          zIndex: 10000000
-        });
-
-        // Add events for moving and stopping
-        angular.element('body').append($drag).css({
-          userSelect: 'none'
-        }).on('mousemove', function(event) {
-          // Determine where the thing can be dragged
-          $drag.css({
-            top: 'e50DragX' in ctrl.$attrs ?
-              gravity(iTop, event.clientY - diffTop) : event.clientY - diffTop,
-            left: 'e50DragY' in ctrl.$attrs ?
-              gravity(iLeft, event.clientX - diffLeft) : event.clientX - diffLeft
-          });
-        }).on('mouseup', function() {
-          $drag.remove();
-          ctrl.$element.css({
-            opacity: 1
-          });
-          angular.element('body').css({
-            userSelect: ''
-          }).off('mouseup mousemove');
-        });
+        scope.e50StartDrag(event);
       });
-
-      // Optional effect that makes restricting by x or y have 'gravity'
-      function gravity(earth, moon) {
-        if ('e50DragGravity' in ctrl.$attrs) {
-          var r = ctrl.$attrs.e50DragGravity || 0;
-          var dist = Math.abs(moon - earth);
-          var pull = dist > r ? Math.round(Math.sqrt(dist - r)) + r : dist;
-          return earth + (earth < moon ? 1 : -1) * pull;
-        } else {
-          return earth;
-        }
-      }
 
     }
   };
@@ -73,10 +23,120 @@ angular.module('e50Table').directive('e50DragHandle', function () {
 angular.module('e50Table').directive('e50Drag', function () {
   return {
     restrict: 'A',
-    controller: ["$element", "$attrs", function($element, $attrs) {
-      this.$element = $element;
-      this.$attrs = $attrs;
-    }]
+    require: '^e50Table',
+    link: function postLink(scope, element, attrs, ctrl) {
+
+      var $drag, diffTop, diffLeft, iTop, iLeft, rowMap, index;
+
+      // Start dragging the row
+      scope.e50StartDrag = function(event) {
+        iTop = element[0].getBoundingClientRect().top;
+        iLeft = element[0].getBoundingClientRect().left;
+        diffTop = event.clientY - iTop;
+        diffLeft = event.clientX - iLeft;
+
+        // Get row map and current row index
+        rowMap = getRowMap();
+        index = getRowIndex();
+
+        // Set the underlying element style
+        element.addClass('e50-dragging');
+
+        // Create the dragging border element
+        $drag = angular.element('<div></div>').css({
+          position: 'absolute',
+          width: element[0].clientWidth,
+          height: element[0].clientHeight,
+          top: iTop,
+          left: iLeft,
+          border: '2px dashed #999',
+          zIndex: 10000000,
+          cursor: 'move'
+        });
+
+        // Add events for moving and stopping
+        angular.element('body').append($drag).css({
+          userSelect: 'none'
+
+        }).on('mousemove', function(event) {
+          // Determine where the thing is dragged
+          var cTop = 'e50DragX' in attrs ?
+              gravity(iTop, event.clientY - diffTop) : event.clientY - diffTop;
+          var cLeft = 'e50DragY' in attrs ?
+              gravity(iLeft, event.clientX - diffLeft) : event.clientX - diffLeft;
+          $drag.css({ top: cTop, left: cLeft });
+          // Determine where to drop it
+          moveRow(cTop, cLeft);
+
+        }).on('mouseup', function() {
+          $drag.remove();
+          element.removeClass('e50-dragging');
+          angular.element('body').css({
+            userSelect: ''
+          }).off('mouseup mousemove');
+        });
+      };
+
+      // Get a map of all row positions in the table
+      function getRowMap() {
+        var rows = ctrl.$element[0].querySelectorAll('[e50-table-row]');
+        var map = [];
+        angular.forEach(rows, function(row) {
+          map.push({
+            top: row.getBoundingClientRect().top,
+            left: row.getBoundingClientRect().left
+          });
+        });
+        return map;
+      }
+
+      // Get the index of the current row
+      function getRowIndex() {
+        var key = 'e50DataKey' in ctrl.$attrs ? ctrl.$attrs.e50DataKey : 't';
+        scope[key].$$e50FindRow = true;
+        for (var i = 0; i < scope.e50FilteredData.length; i++) {
+          if (scope.e50FilteredData[i].$$e50FindRow) {
+            delete scope[key].$$e50FindRow;
+            return i;
+          }
+        }
+      }
+
+      // Optional effect that makes restricting by x or y have 'gravity'
+      function gravity(earth, moon) {
+        if ('e50DragGravity' in attrs) {
+          var r = attrs.e50DragGravity || 0;
+          var dist = Math.abs(moon - earth);
+          var pull = dist > r ? Math.round(Math.sqrt(dist - r)) + r : dist;
+          return earth + (earth < moon ? 1 : -1) * pull;
+        } else {
+          return earth;
+        }
+      }
+
+      // Find the closest row location and drop the dragged item
+      function moveRow(cTop, cLeft) {
+        var closestDist = Number.MAX_VALUE;
+        var closestIndex;
+        // Find the closest dropzone
+        angular.forEach(rowMap, function(row, r) {
+          var dTop = row.top - cTop;
+          var dLeft = row.left - cLeft;
+          var dist = Math.sqrt(dTop*dTop + dLeft*dLeft);
+          if (dist < closestDist) {
+            closestDist = dist;
+            closestIndex = r;
+          }
+        });
+        // Reorder the list and recalculate map
+        if (index !== closestIndex) {
+          scope.e50MoveData(index, closestIndex);
+          index = closestIndex;
+          rowMap = getRowMap();
+        }
+      }
+
+    }
   };
 });
 
@@ -378,8 +438,8 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
   return {
     restrict: 'A',
     scope: true,
-    controller: ["$scope", "$attrs", function($scope, $attrs) {
-      this.$scope = $scope;
+    controller: ["$element", "$attrs", function($element, $attrs) {
+      this.$element = $element;
       this.$attrs = $attrs;
     }],
     compile: function(tElement, tAttrs) {
@@ -461,8 +521,6 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
           scope.e50SetData = function(data) {
             smartUpdate($parse(attrs.e50Data)(scope), data, false);
           };
-          scope.$on('$destroy', function() {
-          });
 
         // If maintaining all data locally
         } else {
@@ -473,9 +531,17 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
           scope.e50SetData = function(data) {
             smartUpdate(localData, data, true);
           };
-          scope.$on('$destroy', function() {
-          });
         }
+
+        // Move an item from one index to another
+        scope.e50MoveData = function(from, to) {
+          var dataList = scope.e50GetData();
+          if ('e50DataProp' in attrs) {
+            dataList = dataList[attrs.e50DataProp] ? dataList[attrs.e50DataProp] : [];
+          }
+          dataList.splice(to, 0, dataList.splice(from, 1)[0]);
+          scope.$digest();
+        };
 
         function applyData(newData, local) {
             if (local) {
@@ -493,7 +559,7 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
           // Determine the actual lists
           var oldDataList = oldData;
           var newDataList = newData;
-          if ('e50DataProp' in attrs && typeof newData !== 'undefined') {
+          if ('e50DataProp' in attrs) {
             oldDataList = oldData[attrs.e50DataProp] ? oldData[attrs.e50DataProp] : [];
             newDataList = newData[attrs.e50DataProp] ? newData[attrs.e50DataProp] : [];
             // Update any non-list properties

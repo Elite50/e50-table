@@ -2,8 +2,8 @@ angular.module('e50Table').directive('e50Table', function ($parse) {
   return {
     restrict: 'A',
     scope: true,
-    controller: function($scope, $attrs) {
-      this.$scope = $scope;
+    controller: function($element, $attrs) {
+      this.$element = $element;
       this.$attrs = $attrs;
     },
     compile: function(tElement, tAttrs) {
@@ -85,8 +85,6 @@ angular.module('e50Table').directive('e50Table', function ($parse) {
           scope.e50SetData = function(data) {
             smartUpdate($parse(attrs.e50Data)(scope), data, false);
           };
-          scope.$on('$destroy', function() {
-          });
 
         // If maintaining all data locally
         } else {
@@ -97,9 +95,17 @@ angular.module('e50Table').directive('e50Table', function ($parse) {
           scope.e50SetData = function(data) {
             smartUpdate(localData, data, true);
           };
-          scope.$on('$destroy', function() {
-          });
         }
+
+        // Move an item from one index to another
+        scope.e50MoveData = function(from, to) {
+          var dataList = scope.e50GetData();
+          if ('e50DataProp' in attrs) {
+            dataList = dataList[attrs.e50DataProp] ? dataList[attrs.e50DataProp] : [];
+          }
+          dataList.splice(to, 0, dataList.splice(from, 1)[0]);
+          scope.$digest();
+        };
 
         function applyData(newData, local) {
             if (local) {
@@ -117,7 +123,7 @@ angular.module('e50Table').directive('e50Table', function ($parse) {
           // Determine the actual lists
           var oldDataList = oldData;
           var newDataList = newData;
-          if ('e50DataProp' in attrs && typeof newData !== 'undefined') {
+          if ('e50DataProp' in attrs) {
             oldDataList = oldData[attrs.e50DataProp] ? oldData[attrs.e50DataProp] : [];
             newDataList = newData[attrs.e50DataProp] ? newData[attrs.e50DataProp] : [];
             // Update any non-list properties

@@ -27,10 +27,9 @@ angular.module('e50Table').directive('e50Drag', function () {
           height: element[0].clientHeight,
           top: iTop,
           left: iLeft,
-          border: '2px dashed #999',
           zIndex: 10000000,
           cursor: 'move'
-        });
+        }).addClass('e50-drag-overlay');
 
         // Add events for moving and stopping
         angular.element('body').append($drag).css({
@@ -83,7 +82,7 @@ angular.module('e50Table').directive('e50Drag', function () {
       // Optional effect that makes restricting by x or y have 'gravity'
       function gravity(earth, moon) {
         if ('e50DragGravity' in attrs) {
-          var r = attrs.e50DragGravity || 0;
+          var r = parseInt(attrs.e50DragGravity) || 0;
           var dist = Math.abs(moon - earth);
           var pull = dist > r ? Math.round(Math.sqrt(dist - r)) + r : dist;
           return earth + (earth < moon ? 1 : -1) * pull;

@@ -72,9 +72,9 @@ The Elite50 Table supports many different HTML attributes, allowing for a large 
 
 **Required**. Placed on a *different* HTML element than `e50-table`. This element will be repeated for each value in the data set, creating multiple child scopes. Works very similarly to [ngRepeat](https://docs.angularjs.org/api/ng/directive/ngRepeat).
 
-#### `e50-data="array"`
+#### `e50-data="expr:array|object"`
 
-If provided, passes in an `array` of static data to populate the table. Each value in the array becomes a separate scope variable `t` for an individual `e50-table-row`.
+If provided, passes in an Angular expression returning the data with which to populate the table. Each value in the array becomes a separate scope variable `t` for an individual `e50-table-row`.
 
 This creates a two-way binding between the table data and the parent scope variable passed in. The value is expected to be an array unless `e50-data-prop` is set. The row value `t` can can be given a different alias using `e50-data-key`.
 
@@ -118,11 +118,11 @@ $scope.myList = {
 
 **Default: `t`**. If provided, changes the alias of an individual data value in each row's child scope from `t` to `string`.
 
-#### `e50-fetch="url"`
+#### `e50-fetch="string"`
 
-If provided, the table will make an AJAX request to the specified `url` and use the response to populate the table. It expects the response as a JSON object with a `data` property, which it will use to fill the table.
+If provided, the table will make an AJAX request to the specified url `string` and use the response to populate the table. It expects the response as a JSON object with a `data` property, which it will use to fill the table.
 
-The `url` can be parameterized using `:param` syntax, as in [ngResource](https://docs.angularjs.org/api/ngResource). These paremeters will be populated by the `e50-fetch-params` attribute.
+The `string` can be parameterized using `:param` syntax, as in [ngResource](https://docs.angularjs.org/api/ngResource). These paremeters will be populated by the `e50-fetch-params` attribute.
 
 If `e50-data` is set, the result of the fetch will replace the parent scope variable defined by the `e50-data` attributed.
 
@@ -130,13 +130,13 @@ By default, the directive will make a `GET` request with no parameters. This, an
 
 See `e50-fetch-params` for examples.
 
-#### `e50-fetch-method="method"`
+#### `e50-fetch-method="string"`
 
 **Requires `e50-fetch`**. **Default: 'GET'**. Specifies the type of HTTP request to make when fetching table data.
 
-#### `e50-fetch-params="object"`
+#### `e50-fetch-params="expr:object"`
 
-**Requires `e50-fetch`**. If provided, defines additional parameters to be sent in the fetch HTTP request. This can be any parent-scope parsable object.
+**Requires `e50-fetch`**. If provided, defines additional parameters to be sent in the fetch HTTP request.
 
 If the url defined by `e50-fetch` has any `:param` syntax parameters, they will be drawn from this object. Any additional keys will be passed as query string parameters.
 
@@ -164,9 +164,13 @@ The above would make a GET request to `/endpoint/names?count=10`.
 
 This makes the same request as **Example 1**.
 
-#### `e50-fetch-body="object"`
+#### `e50-fetch-body="expr:object"`
 
 **Requires `e50-fetch`**. Similarly to `e50-fetch-params`, this object is sent as the body of the HTTP request (if the `e50-fetch-method` supports request bodies). Like for `e50-fetch-params`, a new request will be made every time this object is changed (unless `e50-fetch-once` or `e50-fetch-limit` is set).
+
+#### `e50-if-error="expr:function"`
+
+**Requires `e50-fetch`**. If provided, the table will call `function` in the event of an AJAX error (passing the response body as an argument).
 
 #### `e50-fetch-once`
 
@@ -175,7 +179,7 @@ This makes the same request as **Example 1**.
 #### `e50-poll` `e50-poll="integer"`
 
 **Requires `e50-fetch`**. If provided, the table will make a fetch request every
-`1000ms` (or `integer` milliseconds if a value is provided), and update the table if the response is successful and the data has changed.
+`1000ms` (or `integer` milliseconds if a value is provided), and update the table if the response is successful and the data has changed. The table only polls when the window has focus.
 
 #### `e50-infinite-scroll`
 
@@ -193,9 +197,9 @@ If any of the other `e50-fetch-params` or `e50-fetch-body` values change, the `o
 
 **Requires `e50-infinite-scroll`**. **Default: 'limit'**. Specifies a different name for the infinite-scrolling limit parameter included in either `e50-fetch-params` or `e50-fetch-body`.
 
-#### `e50-filter="function"`
+#### `e50-filter="expr:function"`
 
-If provided, the table will be filtered according to parent scope function provided. The function takes in a single row's data as a parameter, and must return true if it should be included, or false otherwise.
+If provided, the table will be filtered according to parent scope function provided. The function takes in a single row's data as a parameter, and must return `true` if it should be included, or `false` otherwise.
 
 ##### Example:
 
@@ -228,19 +232,23 @@ $scope.data = ['Will', 'James', 'John', 'George'];
 |Will|
 |John|
 
-#### `e50-sort="string"`
+#### `e50-sort="expr:string"`
 
-If provided, will order the table data according to the provided `string`. Uses the same format as an Angular string [orderBy](https://docs.angularjs.org/api/ng/filter/orderBy) expression.
+If provided, will order the table data according to the resolved `string`. Uses the same format as an Angular string [orderBy](https://docs.angularjs.org/api/ng/filter/orderBy) expression.
 
-#### `e50-sort-reverse="string"`
+#### `e50-sort-reverse="expr:boolean"`
 
-**Requires `e50-sort`**. If provided, will reverse the table sort order according to its value cast as a boolean. Namely, if `string='true'` the ordering will be reversed.
+**Requires `e50-sort`**. If provided, will reverse the table sort order if its value resolves to `true`.
+
+#### `e50-sort-lock="expr:boolean"`
+
+**Requires `e50-sort`**. If provided, will 'lock' the table rows in place when its value resolves to `true`, ignoring changes to `e50-sort` and `e50-sort-reverse`. If its value becomes `false`, sorting will immediately update.
 
 #### `e50-fetch-limit="integer"`
 
-**Requires `e50-fetch`, `e50-fetch-limit-prop`**. If provided, the table will act as though `e50-fetch-once` is set, if a fetched property (see `e50-fetch-limit-prop`) is less than or equal to `integer`.
+**Requires `e50-fetch`, `e50-fetch-limit-prop`**. If provided, the table will act as though `e50-fetch-once` is set if a fetched property (see `e50-fetch-limit-prop`) is less than or equal to `integer`.
 
-This feature is useful if you have data sets of varying sizes, and you want to forego server-side sorting if the total size of the data set is less than an arbitrary limit.
+This feature is useful if you have data sets of varying sizes, and you want to forego server-side sorting if the total size of the data set is less than a particular limit.
 
 See `e50-fetch-limit-prop` for an example.
 
@@ -285,7 +293,7 @@ In this situation, the data will only be fetched once if `data.total` <= 5. In t
 
 #### `e50-loading` `e50-loading="string"`
 
-**Requires `e50-fetch`**. If provided, will $emit and/or $broadcast an event when a fetch is in progress. If `string = 'broadcast'`, it will only $broadcast. If `string = 'emit'`, it will only $emit.
+**Requires `e50-fetch`**. If provided, will $emit and/or $broadcast an event when a fetch is in progress. If its value is `'broadcast'`, it will only $broadcast. If its value is `'emit'`, it will only $emit.
 
 The events emitted are the equivalent of
 ```javascript
@@ -295,7 +303,7 @@ $scope.$emit('loading-hide', 'e50-table-loading');
 
 #### `e50-infinite-loading` `e50-infinite-loading="string"`
 
-**Requires `e50-fetch`, `e50-infinite-scroll`**. If provided, will $emit and/or $broadcast an event when an infinite-scroll fetch is in progress. If `string = 'broadcast'`, it will only $broadcast. If `string = 'emit'`, it will only $emit.
+**Requires `e50-fetch`, `e50-infinite-scroll`**. If provided, will $emit and/or $broadcast an event when an infinite-scroll fetch is in progress. If its value is `'broadcast'`, it will only $broadcast. If its value is `'emit'`, it will only $emit.
 
 The events emitted are the equivalent of
 ```javascript
@@ -331,11 +339,37 @@ This is useful for toggling between different markup for displaying the same dat
 
 Placed on *any* HTML element within the directive. If provided, hovering over the element will toggle the `string` CSS class (`'hover'` if not specified).
 
+#### `e50-hover-if="expr:boolean"`
+
+**Requires `e50-hover-if`**. Placed on the same element as `e50-hover`. If provided, the hover effect is only enabled when its value resolves to `true`.
+
 #### `e50-no-prop`
 
 Placed on *any* HTML element within the directive. If provided, clicking on the element will not propagate a click event up the inheritance tree.
 
 This is useful if you have a click event on an entire table row, but want to have additional distinct links within a cell in that row.
+
+#### `e50-drag`
+
+**Requires `e50-drag-handle`**. Placed on the same element as `e50-table-row`. If provided, the table rows can be reordered by dragging. While a row is being dragged, it gains the CSS class `'e50-dragging'` and a hovering overlay appears with CSS class `'e50-drag-overlay'`.
+
+Note that dragging the rows will have no effect if `e50-sort` is applied to the table.
+
+#### `e50-drag-handle`
+
+**Requires `e50-drag`**. Placed on the same element as `e50-drag` or *any* child element. This attribute specifies the UI element that initializes the drag. When a user clicks and drags the element, row reordering begins.
+
+#### `e50-drag-x`
+
+**Requires `e50-drag`**. Placed on the same element as `e50-drag`. If provided, drag motion is restricted to the x axis.
+
+#### `e50-drag-y`
+
+**Requires `e50-drag`**. Placed on the same element as `e50-drag`. If provided, drag motion is restricted to the y axis.
+
+#### `e50-drag-gravity` `e50-drag-gravity="integer"`
+
+**Requires `e50-drag-x` *or* `e50-drag-y`**. **Default: 0**. Placed on the same element as `e50-drag`. If provided, adds a 'gravity' visual effect to the drag axis restrictions, allowing a small margin of movement in the restricted directions. If a value is included, the row may be dragged `integer` pixels freely before the gravity takes effect.
 
 ### Scope variables
 

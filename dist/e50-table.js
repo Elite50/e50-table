@@ -241,6 +241,10 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
             } else if (isScroll) {
               hasMore = false;
             }
+            // Optional success handling
+            if ('e50IfSuccess' in attrs) {
+              $parse(attrs.e50IfSuccess)(scope)(response);
+            }
           },
           function(response) {
             // Optional error handling

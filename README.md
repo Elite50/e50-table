@@ -168,6 +168,10 @@ This makes the same request as **Example 1**.
 
 **Requires `e50-fetch`**. Similarly to `e50-fetch-params`, this object is sent as the body of the HTTP request (if the `e50-fetch-method` supports request bodies). Like for `e50-fetch-params`, a new request will be made every time this object is changed (unless `e50-fetch-once` or `e50-fetch-limit` is set).
 
+#### `e50-if-success="expr:function"`
+
+**Requires `e50-fetch`**. If provided, the table will call `function` in the event of a successful AJAX request (passing the response body as an argument).
+
 #### `e50-if-error="expr:function"`
 
 **Requires `e50-fetch`**. If provided, the table will call `function` in the event of an AJAX error (passing the response body as an argument).

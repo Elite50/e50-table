@@ -97,13 +97,26 @@ angular.module('e50Table').directive('e50Table', function ($parse) {
           };
         }
 
-        // Move an item from one index to another
+        // Move an item from one visible index to another
         scope.e50MoveData = function(from, to) {
           var dataList = scope.e50GetData();
           if ('e50DataProp' in attrs) {
             dataList = dataList[attrs.e50DataProp] ? dataList[attrs.e50DataProp] : [];
           }
-          dataList.splice(to, 0, dataList.splice(from, 1)[0]);
+          scope.e50FilteredData[from].$$e50MoveFrom = true;
+          scope.e50FilteredData[to].$$e50MoveTo = true;
+          var realFrom, realTo;
+          angular.forEach(dataList, function(data, d) {
+            if (data.$$e50MoveFrom) {
+              realFrom = d;
+              delete data.$$e50MoveFrom;
+            }
+            if (data.$$e50MoveTo) {
+              realTo = d;
+              delete data.$$e50MoveTo;
+            }
+          });
+          dataList.splice(realTo, 0, dataList.splice(realFrom, 1)[0]);
           scope.$digest();
         };
 

@@ -41,6 +41,9 @@ angular.module('e50Table').directive('e50Drag', function () {
 
         // Set the underlying element style
         element.addClass('e50-dragging');
+        if ('e50DragClass' in attrs) {
+          element.addClass(attrs.e50DragClass);
+        }
 
         // Create the dragging border element
         $drag = angular.element('<div></div>').css({
@@ -52,6 +55,9 @@ angular.module('e50Table').directive('e50Drag', function () {
           zIndex: 10000000,
           cursor: 'move'
         }).addClass('e50-drag-overlay');
+        if ('e50DragOverlayClass' in attrs) {
+          $drag.addClass(attrs.e50DragOverlayClass);
+        }
 
         // Add events for moving and stopping
         angular.element('body').append($drag).css({
@@ -70,6 +76,9 @@ angular.module('e50Table').directive('e50Drag', function () {
         }).on('mouseup', function() {
           $drag.remove();
           element.removeClass('e50-dragging');
+          if ('e50DragClass' in attrs) {
+            element.removeClass(attrs.e50DragClass);
+          }
           angular.element('body').css({
             userSelect: ''
           }).off('mouseup mousemove');
@@ -536,13 +545,26 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
           };
         }
 
-        // Move an item from one index to another
+        // Move an item from one visible index to another
         scope.e50MoveData = function(from, to) {
           var dataList = scope.e50GetData();
           if ('e50DataProp' in attrs) {
             dataList = dataList[attrs.e50DataProp] ? dataList[attrs.e50DataProp] : [];
           }
-          dataList.splice(to, 0, dataList.splice(from, 1)[0]);
+          scope.e50FilteredData[from].$$e50MoveFrom = true;
+          scope.e50FilteredData[to].$$e50MoveTo = true;
+          var realFrom, realTo;
+          angular.forEach(dataList, function(data, d) {
+            if (data.$$e50MoveFrom) {
+              realFrom = d;
+              delete data.$$e50MoveFrom;
+            }
+            if (data.$$e50MoveTo) {
+              realTo = d;
+              delete data.$$e50MoveTo;
+            }
+          });
+          dataList.splice(realTo, 0, dataList.splice(realFrom, 1)[0]);
           scope.$digest();
         };
 

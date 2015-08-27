@@ -19,6 +19,9 @@ angular.module('e50Table').directive('e50Drag', function () {
 
         // Set the underlying element style
         element.addClass('e50-dragging');
+        if ('e50DragClass' in attrs) {
+          element.addClass(attrs.e50DragClass);
+        }
 
         // Create the dragging border element
         $drag = angular.element('<div></div>').css({
@@ -30,6 +33,9 @@ angular.module('e50Table').directive('e50Drag', function () {
           zIndex: 10000000,
           cursor: 'move'
         }).addClass('e50-drag-overlay');
+        if ('e50DragOverlayClass' in attrs) {
+          $drag.addClass(attrs.e50DragOverlayClass);
+        }
 
         // Add events for moving and stopping
         angular.element('body').append($drag).css({
@@ -48,6 +54,9 @@ angular.module('e50Table').directive('e50Drag', function () {
         }).on('mouseup', function() {
           $drag.remove();
           element.removeClass('e50-dragging');
+          if ('e50DragClass' in attrs) {
+            element.removeClass(attrs.e50DragClass);
+          }
           angular.element('body').css({
             userSelect: ''
           }).off('mouseup mousemove');

@@ -355,13 +355,21 @@ This is useful if you have a click event on an entire table row, but want to hav
 
 #### `e50-drag`
 
-**Requires `e50-drag-handle`**. Placed on the same element as `e50-table-row`. If provided, the table rows can be reordered by dragging. While a row is being dragged, it gains the CSS class `'e50-dragging'` and a hovering overlay appears with CSS class `'e50-drag-overlay'`.
+**Requires `e50-drag-handle`**. Placed on the same element as `e50-table-row`. If provided, the table rows can be reordered by dragging. While a row is being dragged, it gains the CSS class `'e50-dragging'` (and optionally the value of `e50-drag-class`) and a hovering overlay appears with CSS class `'e50-drag-overlay'` (and optionally the value of `e50-drag-overlay-class`).
 
 Note that dragging the rows will have no effect if `e50-sort` is applied to the table.
 
 #### `e50-drag-handle`
 
 **Requires `e50-drag`**. Placed on the same element as `e50-drag` or *any* child element. This attribute specifies the UI element that initializes the drag. When a user clicks and drags the element, row reordering begins.
+
+#### `e50-drag-class="string"`
+
+**Requires `e50-drag`**. Placed on the same element as `e50-drag`. If provided, the row being dragged gains the css class `string`.
+
+#### `e50-drag-overlay-class="string"`
+
+**Requires `e50-drag`**. Placed on the same element as `e50-drag`. If provided, the hovering drag overlay gains the css class `string`.
 
 #### `e50-drag-x`
 

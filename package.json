@@ -1,6 +1,6 @@
 {
   "name": "e50-table",
-  "version": "2.3.2",
+  "version": "2.4.0",
   "description": "Elite50 AngularJS Table Directive",
   "repository": "GITHUB REPOSITORY",
   "main": "dist/e50-table.js",

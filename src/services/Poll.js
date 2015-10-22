@@ -11,16 +11,11 @@ angular.module('e50Table').factory('Poll', function($timeout) {
   // Continually run the callback function
   Poll.prototype.poll = function() {
     var that = this;
-    // Fetch only if the document has focus
-    if (document.hasFocus()) {
-      this.callback().finally(function() {
-        if (!that.canceled) {
-          that.wait();
-        }
-      });
-    } else {
-      this.wait();
-    }
+    this.callback().finally(function() {
+      if (!that.canceled) {
+        that.wait();
+      }
+    });
   };
 
   // Run the polling function after a timeout

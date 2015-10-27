@@ -533,7 +533,6 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
         }, function(v) {
           // Using an arbitrarily high number is hacky but unavoidable with Angular 1.3
           scope.e50LimitTo = v[0] ? v[0] : 4815162342;
-          console.log(scope.e50LimitTo);
         }, true);
 
         // If using an external data array

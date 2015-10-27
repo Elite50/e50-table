@@ -463,7 +463,7 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
         var key = 'e50DataKey' in tAttrs ? tAttrs.e50DataKey : 't';
         var prop = 'e50DataProp' in tAttrs ? '.' + tAttrs.e50DataProp : '';
         rpt.value = key + ' in e50FilteredData = (e50GetData()' + prop +
-            ' | orderBy : e50Sort : e50SortReverse | filter : e50Filter)';
+            ' | orderBy : e50Sort : e50SortReverse | filter : e50Filter | limitTo : e50LimitTo)';
         row.attributes.setNamedItem(rpt);
       });
 
@@ -524,6 +524,17 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
             scope.e50SortReverse = $parse(attrs.e50SortReverse)(scope) ? true : false;
           }
         });
+
+        // Watch limiting attribute for changes
+        scope.$watch(function() {
+          return [
+            $parse(attrs.e50LimitTo)(scope)
+          ];
+        }, function(v) {
+          // Using an arbitrarily high number is hacky but unavoidable with Angular 1.3
+          scope.e50LimitTo = v[0] ? v[0] : 4815162342;
+          console.log(scope.e50LimitTo);
+        }, true);
 
         // If using an external data array
         if ('e50Data' in attrs) {

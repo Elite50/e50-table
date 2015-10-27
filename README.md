@@ -205,6 +205,10 @@ If any of the other `e50-fetch-params` or `e50-fetch-body` values change, the `o
 
 If provided, the table will be filtered according to parent scope function provided. The function takes in a single row's data as a parameter, and must return `true` if it should be included, or `false` otherwise.
 
+#### `e50-limit-to="expr:integer"`
+
+If provided, the table will be only display the first `integer` rows of the dataset.
+
 ##### Example:
 
 ```javascript

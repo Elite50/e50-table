@@ -185,11 +185,19 @@ This makes the same request as **Example 1**.
 **Requires `e50-fetch`**. If provided, the table will make a fetch request every
 `1000ms` (or `integer` milliseconds if a value is provided), and update the table if the response is successful and the data has changed. The table only polls when the window has focus.
 
-#### `e50-infinite-scroll`
+#### `e50-infinite-scroll` `e50-infinite-scroll="expr:function(callback)"`
 
-**Requires `e50-fetch`**. If provided, the table will automatically load more results if fully scrolled to the bottom. This requires special `offset` and `limit` keys (or as otherwise defined by `e50-offset-key` or `e50-limit-key`) to be included in either the `e50-fetch-params` or `e50-fetch-body`. The fetch endpoint should account for these parameters (fetching `limit` results starting at `offset`, similar to SQL `select` syntax).
+**Requires `e50-fetch` OR a value OR both**.
 
-If scrolled to the bottom, the `offset` will be incremented by `limit` and the table will fetch, appending the new results to the end of the list. If `e50-poll` is enabled, the `limit` instead will be incremented, increasing the size of the data set fetched on each poll.
+##### If a value is provided:
+
+When the table is fully scrolled to the bottom, `function` will be called, passing in a single `callback` argument. `function` will not be called again until `callback` is called, which resets the infinite scroll listener.
+
+##### If `e50-fetch` is set:
+
+When the table is fully scrolled to the bottom it will automatically fetch more results. This requires special `offset` and `limit` keys (or as otherwise defined by `e50-offset-key` or `e50-limit-key`) to be included in either the `e50-fetch-params` or `e50-fetch-body`. The fetch endpoint should account for these parameters (fetching `limit` results starting at `offset`, similar to SQL `select` syntax).
+
+When scrolled to the bottom, the `offset` will be incremented by `limit` and the table will fetch, appending the new results to the end of the list. If `e50-poll` is enabled, the `limit` instead will be incremented, increasing the size of the data set fetched on each poll.
 
 If any of the other `e50-fetch-params` or `e50-fetch-body` values change, the `offset` and `limit` will reset to their initial values, and the table will update as expected.
 

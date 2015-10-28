@@ -158,7 +158,6 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
       var hasMore = true;
       var polling = 'e50Poll' in attrs;
       var infinite = 'e50InfiniteScroll' in attrs;
-      var scrollParent = false;
       var hasFetched = false;
       var fetchNum = 0;
 
@@ -246,7 +245,9 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
               } else {
                 scope.e50SetData(response.data);
               }
-              $timeout(scope.e50InfiniteScroll);
+              if (infinite) {
+                $timeout(scope.e50InfiniteScroll);
+              }
             } else if (isScroll) {
               hasMore = false;
             }
@@ -307,54 +308,20 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
         });
       }
 
-      // Set up infinite scroll event
-      scope.e50InfiniteScroll = function(redraw) {
-        if (infinite) {
-          // Find the scrolling parent element
-          if (!scrollParent || redraw) {
-            scrollParent = scrollParentFn(element);
+      // Listen for infinite scroll
+      scope.$on('e50-infinite-scroll', function() {
+        // If not currently fetching and there's more to get
+        if (!fetching && hasMore) {
+          // If polling, just up the total limit
+          if (polling) {
+            limit += initialLimit;
+          // Otherwise, fetch the next several rows
+          } else {
+            offset += limit;
           }
-          scrollParent.off('scroll');
-          scrollParent.on('scroll', function() {
-            var lasts = element[0].querySelectorAll('[e50-table-row]:last-child');
-            angular.forEach(lasts, function(last) {
-              if (last.offsetHeight && last.offsetTop < scrollParent[0].scrollTop +
-                  scrollParent[0].offsetHeight + 2*last.offsetHeight && !fetching && hasMore) {
-                // If polling, just up the total limit
-                if (polling) {
-                  limit += initialLimit;
-                // Otherwise, fetch the next several rows
-                } else {
-                  offset += limit;
-                }
-                fetch(false, true);
-              }
-            });
-          });
+          fetch(false, true);
         }
-      };
-      scope.e50InfiniteScroll();
-
-      /**
-       * Determines the first scrollable parent of an element
-       *
-       * jQLite implementation, adapted from slindberg/jquery-scrollparent
-       */
-      function scrollParentFn(elem) {
-        var position = elem.css('position');
-        var excludeStaticParent = position === 'absolute';
-        var parentElem;
-        for (parentElem = elem.parent(); parentElem[0]; parentElem = parentElem.parent()) {
-          if (excludeStaticParent && parentElem.css('position') === 'static') {
-            continue;
-          }
-          if ((/(auto|scroll)/).test(parentElem.css('overflow') +
-                parentElem.css('overflow-y') + parentElem.css('overflow-x'))) {
-            break;
-          }
-        }
-        return position === 'fixed' || !parentElem ? angular.element(elem[0].ownerDocument || document) : parentElem;
-      }
+      });
 
     }
   };
@@ -434,6 +401,69 @@ angular.module('e50Table').directive('e50IfData', function () {
     }
   };
 });
+
+angular.module('e50Table').directive('e50InfiniteScroll', ["$parse", function ($parse) {
+  return {
+    restrict: 'A',
+    require: 'e50Table',
+    link: function(scope, element, attrs) {
+
+      var scrollParent = false;
+      var scrollNum = 0;
+
+      // Set up infinite scroll event
+      scope.e50InfiniteScroll = function(redraw) {
+        var currentNum = scrollNum;
+        // Find the scrolling parent element
+        if (!scrollParent || redraw) {
+          scrollParent = scrollParentFn(element);
+        }
+        scrollParent.off('scroll');
+        scrollParent.on('scroll', function() {
+          var lasts = element[0].querySelectorAll('[e50-table-row]:last-child');
+          angular.forEach(lasts, function(last) {
+            if (currentNum === scrollNum &&
+                last.offsetHeight &&
+                last.offsetTop + last.offsetHeight < scrollParent[0].scrollTop + scrollParent[0].offsetHeight + 200) {
+              // Don't fire event more than once per scroll
+              scrollNum++;
+              scope.$broadcast('e50-infinite-scroll');
+              if (attrs.e50InfiniteScroll) {
+                // Call custom function with callback to rewatch for infinite scroll
+                $parse(attrs.e50InfiniteScroll)(scope)(function(redraw) {
+                  scope.e50InfiniteScroll(redraw);
+                });
+              }
+            }
+          });
+        });
+      };
+      scope.e50InfiniteScroll();
+
+      /**
+       * Determines the first scrollable parent of an element
+       *
+       * jQLite implementation, adapted from slindberg/jquery-scrollparent
+       */
+      function scrollParentFn(elem) {
+        var position = elem.css('position');
+        var excludeStaticParent = position === 'absolute';
+        var parentElem;
+        for (parentElem = elem.parent(); parentElem[0]; parentElem = parentElem.parent()) {
+          if (excludeStaticParent && parentElem.css('position') === 'static') {
+            continue;
+          }
+          if ((/(auto|scroll)/).test(parentElem.css('overflow') +
+                parentElem.css('overflow-y') + parentElem.css('overflow-x'))) {
+            break;
+          }
+        }
+        return position === 'fixed' || !parentElem ? angular.element(elem[0].ownerDocument || document) : parentElem;
+      }
+
+    }
+  };
+}]);
 
 angular.module('e50Table').directive('e50NoProp', function () {
   return {

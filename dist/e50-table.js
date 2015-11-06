@@ -11,6 +11,11 @@ angular.module('e50Table').directive('e50DragHandle', function () {
         cursor: 'move'
       });
 
+      // Prevent browser dragging
+      element.on('dragstart', function() {
+        return false;
+      });
+
       // Listen for the start of dragging
       element.on('mousedown', function(event) {
         scope.e50StartDrag(event);

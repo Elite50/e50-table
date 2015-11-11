@@ -13,9 +13,10 @@
   "license": "MIT",
   "devDependencies": {
     "grunt": "latest",
-    "grunt-ng-annotate": "latest",
+    "grunt-contrib-copy": "^0.8.2",
     "grunt-contrib-uglify": "latest",
-    "grunt-contrib-watch": "latest"
+    "grunt-contrib-watch": "latest",
+    "grunt-ng-annotate": "latest"
   },
   "dependencies": {
     "grunt-bump": "^0.3.0"

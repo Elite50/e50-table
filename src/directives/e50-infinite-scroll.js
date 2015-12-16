@@ -14,8 +14,8 @@ angular.module('e50Table').directive('e50InfiniteScroll', function ($parse) {
         if (!scrollParent || redraw) {
           scrollParent = scrollParentFn(element);
         }
-        scrollParent.off('scroll');
-        scrollParent.on('scroll', function() {
+        scrollParent.off('scroll.e50Table');
+        scrollParent.on('scroll.e50Table', function() {
           var lasts = element[0].querySelectorAll('[e50-table-row]:last-child');
           angular.forEach(lasts, function(last) {
             if (currentNum === scrollNum &&

@@ -153,7 +153,7 @@ angular.module('e50Table').directive('e50Drag', function () {
   };
 });
 
-angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll", "$timeout", function ($parse, $resource, Poll, $timeout) {
+angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "E50Poll", "$timeout", function ($parse, $resource, E50Poll, $timeout) {
   return {
     restrict: 'A',
     require: 'e50Table',
@@ -305,7 +305,7 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "Poll",
 
       // Start polling if element has poll attribute
       if (polling) {
-        var poll = new Poll(function() {
+        var poll = new E50Poll(function() {
           return fetch(true);
         }, attrs.e50Poll);
         scope.$on('$destroy', function() {
@@ -694,10 +694,11 @@ angular.module('e50Table').directive('e50View', ["$timeout", function ($timeout)
   };
 }]);
 
-angular.module('e50Table').factory('Poll', ["$timeout", function($timeout) {
+angular.module('e50Table').factory('E50Poll', ["$timeout", function($timeout) {
 
   // Polling class for live data
   function Poll(callback, delay) {
+    console.log('hi');
     this.delay = delay ? delay : 1000;
     this.callback = callback;
     this.canceled = false;

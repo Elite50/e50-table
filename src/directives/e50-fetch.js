@@ -1,4 +1,4 @@
-angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Poll, $timeout) {
+angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, E50Poll, $timeout) {
   return {
     restrict: 'A',
     require: 'e50Table',
@@ -150,7 +150,7 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, Po
 
       // Start polling if element has poll attribute
       if (polling) {
-        var poll = new Poll(function() {
+        var poll = new E50Poll(function() {
           return fetch(true);
         }, attrs.e50Poll);
         scope.$on('$destroy', function() {

@@ -1,7 +1,8 @@
-angular.module('e50Table').factory('Poll', function($timeout) {
+angular.module('e50Table').factory('E50Poll', function($timeout) {
 
   // Polling class for live data
   function Poll(callback, delay) {
+    console.log('hi');
     this.delay = delay ? delay : 1000;
     this.callback = callback;
     this.canceled = false;

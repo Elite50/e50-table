@@ -311,20 +311,18 @@ In this situation, the data will only be fetched once if `data.total` <= 5. In t
 
 **Requires `e50-fetch`**. If provided, will $emit and/or $broadcast an event when a fetch is in progress. If its value is `'broadcast'`, it will only $broadcast. If its value is `'emit'`, it will only $emit.
 
-The events emitted are the equivalent of
+The event emitted is the equivalent of
 ```javascript
-$scope.$emit('loading-show', 'e50-table-loading');
-$scope.$emit('loading-hide', 'e50-table-loading');
+$scope.$emit('loading', fetchPromise, 'e50-table-loading', true);
 ```
 
 #### `e50-infinite-loading` `e50-infinite-loading="string"`
 
 **Requires `e50-fetch`, `e50-infinite-scroll`**. If provided, will $emit and/or $broadcast an event when an infinite-scroll fetch is in progress. If its value is `'broadcast'`, it will only $broadcast. If its value is `'emit'`, it will only $emit.
 
-The events emitted are the equivalent of
+The event emitted is the equivalent of
 ```javascript
-$scope.$emit('loading-show', 'e50-table-infinite-loading');
-$scope.$emit('loading-hide', 'e50-table-infinite-loading');
+$scope.$emit('loading', fetchPromise, 'e50-table-infinite-loading', true);
 ```
 
 #### `e50-if-data` `e50-data='false'`

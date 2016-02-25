@@ -213,21 +213,13 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "E50Pol
             limit = lObj[limitKey];
           }
         }
-        if ('e50Loading' in attrs && !isPoll && !isScroll && hasFetched) {
-          if (attrs.e50Loading !== 'emit') { scope.$broadcast('loading-show', 'e50-table-loading'); }
-          if (attrs.e50Loading !== 'broadcast') { scope.$emit('loading-show', 'e50-table-loading'); }
-        }
-        if ('e50InfiniteLoading' in attrs && isScroll) {
-          if (attrs.e50InfiniteLoading !== 'emit') { scope.$broadcast('loading-show', 'e50-table-infinite-loading'); }
-          if (attrs.e50InfiniteLoading !== 'broadcast') { scope.$emit('loading-show', 'e50-table-infinite-loading'); }
-        }
         // If it's not a poll, increment the fetchNum counter
         var curFetchNum = fetchNum;
         if (!isPoll) {
           fetchNum++;
           curFetchNum = fetchNum;
         }
-        return fetchResource.fetch(params,body).$promise.then(
+        var promise = fetchResource.fetch(params,body).$promise.then(
           function(response) {
             // The params have been changed, don't use this request
             if (curFetchNum !== fetchNum) {
@@ -269,16 +261,17 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "E50Pol
           }
         ).finally(function() {
           fetching = false;
-          if ('e50Loading' in attrs && !isPoll && !isScroll && hasFetched) {
-            if (attrs.e50Loading !== 'emit') { scope.$broadcast('loading-hide', 'e50-table-loading'); }
-            if (attrs.e50Loading !== 'broadcast') { scope.$emit('loading-hide', 'e50-table-loading'); }
-          }
-          if ('e50InfiniteLoading' in attrs && isScroll) {
-            if (attrs.e50InfiniteLoading !== 'emit') { scope.$broadcast('loading-hide', 'e50-table-infinite-loading'); }
-            if (attrs.e50InfiniteLoading !== 'broadcast') { scope.$emit('loading-hide', 'e50-table-infinite-loading'); }
-          }
           hasFetched = true;
         });
+        if ('e50Loading' in attrs && !isPoll && !isScroll) {
+          if (attrs.e50Loading !== 'emit') { scope.$broadcast('loading', promise, 'e50-table-loading', true); }
+          if (attrs.e50Loading !== 'broadcast') { scope.$emit('loading', promise, 'e50-table-loading', true); }
+        }
+        if ('e50InfiniteLoading' in attrs && isScroll) {
+          if (attrs.e50InfiniteLoading !== 'emit') { scope.$broadcast('loading', promise, 'e50-table-infinite-loading', true); }
+          if (attrs.e50InfiniteLoading !== 'broadcast') { scope.$emit('loading', promise, 'e50-table-infinite-loading', true); }
+        }
+        return promise;
       }
 
       // Only fetch once if desired

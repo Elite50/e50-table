@@ -308,8 +308,8 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "E50Pol
 
       // Listen for infinite scroll
       scope.$on('e50-infinite-scroll', function() {
-        // If not currently fetching and there's more to get
-        if (!fetching && hasMore) {
+        // If there's more to get
+        if (hasMore) {
           // If polling, just up the total limit
           if (polling) {
             limit += initialLimit;

@@ -250,15 +250,15 @@ If provided, the table will be only display the first `integer` rows of the data
 
 #### `e50-sort="expr:string"`
 
-If provided, will order the table data according to the resolved `string`. Uses the same format as an Angular string [orderBy](https://docs.angularjs.org/api/ng/filter/orderBy) expression.
+If provided, will order the table data according to the evaluated `string`. Uses the same format as an Angular string [orderBy](https://docs.angularjs.org/api/ng/filter/orderBy) expression.
 
 #### `e50-sort-reverse="expr:boolean"`
 
-**Requires `e50-sort`**. If provided, will reverse the table sort order if its value resolves to `true`.
+**Requires `e50-sort`**. If provided, will reverse the table sort order if its value evaluates to `true`.
 
 #### `e50-sort-lock="expr:boolean"`
 
-**Requires `e50-sort`**. If provided, will 'lock' the table rows in place when its value resolves to `true`, ignoring changes to `e50-sort` and `e50-sort-reverse`. If its value becomes `false`, sorting will immediately update.
+**Requires `e50-sort`**. If provided, will 'lock' the table rows in place when its value evaluates to `true`, ignoring changes to `e50-sort` and `e50-sort-reverse`. If its value becomes `false`, sorting will immediately update.
 
 #### `e50-fetch-limit="integer"`
 
@@ -315,6 +315,7 @@ The event emitted is the equivalent of
 ```javascript
 $scope.$emit('loading', fetchPromise, 'e50-table-loading', true);
 ```
+where `fetchPromise` is a Promise that will be resolved when the fetch completes.
 
 #### `e50-infinite-loading` `e50-infinite-loading="string"`
 
@@ -324,6 +325,7 @@ The event emitted is the equivalent of
 ```javascript
 $scope.$emit('loading', fetchPromise, 'e50-table-infinite-loading', true);
 ```
+where `fetchPromise` is a Promise that will be resolved when the fetch completes.
 
 #### `e50-if-data` `e50-data='false'`
 
@@ -355,11 +357,11 @@ Placed on *any* HTML element within the directive. If provided, hovering over th
 
 #### `e50-hover-if="expr:boolean"`
 
-**Requires `e50-hover-if`**. Placed on the same element as `e50-hover`. If provided, the hover effect is only enabled when its value resolves to `true`.
+**Requires `e50-hover-if`**. Placed on the same element as `e50-hover`. If provided, the hover effect is only enabled when its value evaluates to `true`.
 
 #### `e50-no-prop`
 
-Placed on *any* HTML element within the directive. If provided, clicking on the element will not propagate a click event up the inheritance tree.
+Placed on *any* HTML element within the directive. If provided, clicking on the element will not propagate a click event up the DOM.
 
 This is useful if you have a click event on an entire table row, but want to have additional distinct links within a cell in that row.
 
@@ -407,7 +409,7 @@ A function that replaces the table's data set with `data`.
 
 #### `e50DeleteRow(row)`
 
-A function that filters out a particular row from the data set in a way that persists across fetches. Currently, this requires that the row data object has an `id` property.
+A function that filters out a particular row from the data set in a way that persists across fetches. This requires that the row data object has an `id` property.
 
 This is useful if you want to have a delete link on your row, or use it as a callback after making a delete AJAX request.
 

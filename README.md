@@ -183,7 +183,7 @@ This makes the same request as **Example 1**.
 #### `e50-poll` `e50-poll="integer"`
 
 **Requires `e50-fetch`**. If provided, the table will make a fetch request every
-`1000ms` (or `integer` milliseconds if a value is provided), and update the table if the response is successful and the data has changed. The table only polls when the window has focus.
+`1000ms` (or `integer` milliseconds if a value is provided), and update the table if the response is successful and the data has changed.
 
 #### `e50-infinite-scroll` `e50-infinite-scroll="expr:function(callback)"`
 
@@ -212,10 +212,6 @@ If any of the other `e50-fetch-params` or `e50-fetch-body` values change, the `o
 #### `e50-filter="expr:function"`
 
 If provided, the table will be filtered according to parent scope function provided. The function takes in a single row's data as a parameter, and must return `true` if it should be included, or `false` otherwise.
-
-#### `e50-limit-to="expr:integer"`
-
-If provided, the table will be only display the first `integer` rows of the dataset.
 
 ##### Example:
 
@@ -247,6 +243,10 @@ $scope.data = ['Will', 'James', 'John', 'George'];
 |----|
 |Will|
 |John|
+
+#### `e50-limit-to="expr:integer"`
+
+If provided, the table will be only display the first `integer` rows of the dataset.
 
 #### `e50-sort="expr:string"`
 

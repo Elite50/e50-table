@@ -4,12 +4,14 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, E5
     require: 'e50Table',
     link: function(scope, element, attrs) {
 
-      var fetching = false;
       var hasMore = true;
       var polling = 'e50Poll' in attrs;
       var infinite = 'e50InfiniteScroll' in attrs;
       var hasFetched = false;
       var fetchNum = 0;
+
+      // Keep track of pending requests
+      scope.e50FetchCount = 0;
 
       // Get initial params and body
       var params = angular.copy($parse(attrs.e50FetchParams)(scope));
@@ -34,7 +36,6 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, E5
 
       // Fetch the table data
       function fetch(isPoll, isScroll) {
-        fetching = true;
         params = angular.copy($parse(attrs.e50FetchParams)(scope));
         body = angular.copy($parse(attrs.e50FetchBody)(scope));
         var append = false;
@@ -63,6 +64,7 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, E5
         if (!isPoll) {
           fetchNum++;
           curFetchNum = fetchNum;
+          scope.e50FetchCount++;
         }
         var promise = fetchResource.fetch(params,body).$promise.then(
           function(response) {
@@ -105,8 +107,10 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, E5
             }
           }
         ).finally(function() {
-          fetching = false;
           hasFetched = true;
+          if (!isPoll) {
+            scope.e50FetchCount--;
+          }
         });
         if ('e50Loading' in attrs && !isPoll && !isScroll) {
           if (attrs.e50Loading !== 'emit') { scope.$broadcast('loading', promise, 'e50-table-loading', true); }

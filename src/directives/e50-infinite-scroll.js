@@ -23,9 +23,15 @@ angular.module('e50Table').directive('e50InfiniteScroll', function ($parse) {
                 last.offsetTop + last.offsetHeight < scrollParent[0].scrollTop + scrollParent[0].offsetHeight + 200) {
               // Don't fire event more than once per scroll
               scrollNum++;
-              scope.$broadcast('e50-infinite-scroll');
+              // Only fetch if not currently fetching
+              if (!scope.e50FetchCount) {
+                scope.$broadcast('e50-infinite-scroll');
+              } else if (!attrs.e50InfiniteScroll) {
+                // Only reattach scroll listener if not handling it manually
+                scope.e50InfiniteScroll();
+              }
+              // Call custom function with callback to rewatch for infinite scroll
               if (attrs.e50InfiniteScroll) {
-                // Call custom function with callback to rewatch for infinite scroll
                 $parse(attrs.e50InfiniteScroll)(scope)(function(redraw) {
                   scope.e50InfiniteScroll(redraw);
                 });

@@ -159,12 +159,14 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "E50Pol
     require: 'e50Table',
     link: function(scope, element, attrs) {
 
-      var fetching = false;
       var hasMore = true;
       var polling = 'e50Poll' in attrs;
       var infinite = 'e50InfiniteScroll' in attrs;
       var hasFetched = false;
       var fetchNum = 0;
+
+      // Keep track of pending requests
+      scope.e50FetchCount = 0;
 
       // Get initial params and body
       var params = angular.copy($parse(attrs.e50FetchParams)(scope));
@@ -189,7 +191,6 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "E50Pol
 
       // Fetch the table data
       function fetch(isPoll, isScroll) {
-        fetching = true;
         params = angular.copy($parse(attrs.e50FetchParams)(scope));
         body = angular.copy($parse(attrs.e50FetchBody)(scope));
         var append = false;
@@ -218,6 +219,7 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "E50Pol
         if (!isPoll) {
           fetchNum++;
           curFetchNum = fetchNum;
+          scope.e50FetchCount++;
         }
         var promise = fetchResource.fetch(params,body).$promise.then(
           function(response) {
@@ -260,8 +262,10 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "E50Pol
             }
           }
         ).finally(function() {
-          fetching = false;
           hasFetched = true;
+          if (!isPoll) {
+            scope.e50FetchCount--;
+          }
         });
         if ('e50Loading' in attrs && !isPoll && !isScroll) {
           if (attrs.e50Loading !== 'emit') { scope.$broadcast('loading', promise, 'e50-table-loading', true); }
@@ -425,9 +429,15 @@ angular.module('e50Table').directive('e50InfiniteScroll', ["$parse", function ($
                 last.offsetTop + last.offsetHeight < scrollParent[0].scrollTop + scrollParent[0].offsetHeight + 200) {
               // Don't fire event more than once per scroll
               scrollNum++;
-              scope.$broadcast('e50-infinite-scroll');
+              // Only fetch if not currently fetching
+              if (!scope.e50FetchCount) {
+                scope.$broadcast('e50-infinite-scroll');
+              } else if (!attrs.e50InfiniteScroll) {
+                // Only reattach scroll listener if not handling it manually
+                scope.e50InfiniteScroll();
+              }
+              // Call custom function with callback to rewatch for infinite scroll
               if (attrs.e50InfiniteScroll) {
-                // Call custom function with callback to rewatch for infinite scroll
                 $parse(attrs.e50InfiniteScroll)(scope)(function(redraw) {
                   scope.e50InfiniteScroll(redraw);
                 });

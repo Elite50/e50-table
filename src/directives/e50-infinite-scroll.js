@@ -16,7 +16,8 @@ angular.module('e50Table').directive('e50InfiniteScroll', function ($parse) {
         }
         scrollParent.off('scroll.e50Table');
         scrollParent.on('scroll.e50Table', function() {
-          var lasts = element[0].querySelectorAll('[e50-table-row]:last-child');
+          var attrValue = attrs.e50Table ? '=' + attrs.e50Table : '';
+          var lasts = element[0].querySelectorAll('[e50-table-row' + attrValue + ']:last-child');
           angular.forEach(lasts, function(last) {
             if (currentNum === scrollNum &&
                 last.offsetHeight &&

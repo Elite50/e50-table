@@ -9,7 +9,8 @@ angular.module('e50Table').directive('e50Table', function ($parse) {
     compile: function(tElement, tAttrs) {
 
       // Create ng-repeat on the e50-table-row
-      var rows = tElement[0].querySelectorAll('[e50-table-row]');
+      var attrValue = tAttrs.e50Table ? '=' + tAttrs.e50Table : '';
+      var rows = tElement[0].querySelectorAll('[e50-table-row' + attrValue + ']');
       angular.forEach(rows, function(row) {
         var rpt = document.createAttribute('ng-repeat');
         var key = 'e50DataKey' in tAttrs ? tAttrs.e50DataKey : 't';

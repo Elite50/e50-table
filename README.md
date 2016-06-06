@@ -64,13 +64,13 @@ $scope.myList = [
 
 The Elite50 Table supports many different HTML attributes, allowing for a large degree of customization and functionality. With the exception of `e50-table` and `e50-table-row`, all attributes are optional. The full list of possible attributes follows:
 
-#### `e50-table`
+#### `e50-table` `e50-table="string"`
 
-**Required**. Demarcates the directive and establishes a child scope. Unless otherwise stated, all Elite50 Table attributes must be placed on the same HTML element as this one.
+**Required**. Demarcates the directive and establishes a child scope. Unless otherwise stated, all Elite50 Table attributes must be placed on the same HTML element as this one. If a value is provided, it will seek only `e50-table-row` elements with the same value (allowing for nesting of multiple tables).
 
-#### `e50-table-row`
+#### `e50-table-row` `e50-table-row="string"`
 
-**Required**. Placed on a *different* HTML element than `e50-table`. This element will be repeated for each value in the data set, creating multiple child scopes. Works very similarly to [ngRepeat](https://docs.angularjs.org/api/ng/directive/ngRepeat).
+**Required**. Placed on a *different* HTML element than `e50-table`. This element will be repeated for each value in the data set, creating multiple child scopes. Works very similarly to [ngRepeat](https://docs.angularjs.org/api/ng/directive/ngRepeat). If a value is provided, it will be sought only by `e50-table` elements with the same value (allowing for nesting of multiple tables).
 
 #### `e50-data="expr:array|object"`
 

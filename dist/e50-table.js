@@ -92,7 +92,8 @@ angular.module('e50Table').directive('e50Drag', function () {
 
       // Get a map of all row positions in the table
       function getRowMap() {
-        var rows = ctrl.$element[0].querySelectorAll('[e50-table-row]');
+        var attrValue = ctrl.$attrs.e50Table ? '=' + ctrl.$attrs.e50Table : '';
+        var rows = ctrl.$element[0].querySelectorAll('[e50-table-row' + attrValue + ']');
         var map = [];
         angular.forEach(rows, function(row) {
           map.push({
@@ -422,7 +423,8 @@ angular.module('e50Table').directive('e50InfiniteScroll', ["$parse", function ($
         }
         scrollParent.off('scroll.e50Table');
         scrollParent.on('scroll.e50Table', function() {
-          var lasts = element[0].querySelectorAll('[e50-table-row]:last-child');
+          var attrValue = attrs.e50Table ? '=' + attrs.e50Table : '';
+          var lasts = element[0].querySelectorAll('[e50-table-row' + attrValue + ']:last-child');
           angular.forEach(lasts, function(last) {
             if (currentNum === scrollNum &&
                 last.offsetHeight &&
@@ -495,7 +497,8 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
     compile: function(tElement, tAttrs) {
 
       // Create ng-repeat on the e50-table-row
-      var rows = tElement[0].querySelectorAll('[e50-table-row]');
+      var attrValue = tAttrs.e50Table ? '=' + tAttrs.e50Table : '';
+      var rows = tElement[0].querySelectorAll('[e50-table-row' + attrValue + ']');
       angular.forEach(rows, function(row) {
         var rpt = document.createAttribute('ng-repeat');
         var key = 'e50DataKey' in tAttrs ? tAttrs.e50DataKey : 't';

@@ -65,7 +65,8 @@ angular.module('e50Table').directive('e50Drag', function () {
 
       // Get a map of all row positions in the table
       function getRowMap() {
-        var rows = ctrl.$element[0].querySelectorAll('[e50-table-row]');
+        var attrValue = ctrl.$attrs.e50Table ? '=' + ctrl.$attrs.e50Table : '';
+        var rows = ctrl.$element[0].querySelectorAll('[e50-table-row' + attrValue + ']');
         var map = [];
         angular.forEach(rows, function(row) {
           map.push({

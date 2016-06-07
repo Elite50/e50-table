@@ -1,4 +1,4 @@
-angular.module('e50Table').directive('e50Drag', function () {
+angular.module('e50Table').directive('e50Drag', function ($timeout) {
   return {
     restrict: 'A',
     require: '^e50Table',
@@ -8,58 +8,60 @@ angular.module('e50Table').directive('e50Drag', function () {
 
       // Start dragging the row
       scope.e50StartDrag = function(event) {
-        iTop = element[0].getBoundingClientRect().top;
-        iLeft = element[0].getBoundingClientRect().left;
-        diffTop = event.clientY - iTop;
-        diffLeft = event.clientX - iLeft;
+        $timeout(function() {
+          iTop = element[0].getBoundingClientRect().top;
+          iLeft = element[0].getBoundingClientRect().left;
+          diffTop = event.clientY - iTop;
+          diffLeft = event.clientX - iLeft;
 
-        // Get row map and current row index
-        rowMap = getRowMap();
-        index = getRowIndex();
+          // Get row map and current row index
+          rowMap = getRowMap();
+          index = getRowIndex();
 
-        // Set the underlying element style
-        element.addClass('e50-dragging');
-        if ('e50DragClass' in attrs) {
-          element.addClass(attrs.e50DragClass);
-        }
-
-        // Create the dragging border element
-        $drag = angular.element('<div></div>').css({
-          position: 'absolute',
-          width: element[0].clientWidth,
-          height: element[0].clientHeight,
-          top: iTop,
-          left: iLeft,
-          zIndex: 10000000,
-          cursor: 'move'
-        }).addClass('e50-drag-overlay');
-        if ('e50DragOverlayClass' in attrs) {
-          $drag.addClass(attrs.e50DragOverlayClass);
-        }
-
-        // Add events for moving and stopping
-        angular.element('body').append($drag).css({
-          userSelect: 'none'
-
-        }).on('mousemove', function(event) {
-          // Determine where the thing is dragged
-          var cTop = 'e50DragX' in attrs ?
-              gravity(iTop, event.clientY - diffTop) : event.clientY - diffTop;
-          var cLeft = 'e50DragY' in attrs ?
-              gravity(iLeft, event.clientX - diffLeft) : event.clientX - diffLeft;
-          $drag.css({ top: cTop, left: cLeft });
-          // Determine where to drop it
-          moveRow(cTop, cLeft);
-
-        }).on('mouseup', function() {
-          $drag.remove();
-          element.removeClass('e50-dragging');
+          // Set the underlying element style
+          element.addClass('e50-dragging');
           if ('e50DragClass' in attrs) {
-            element.removeClass(attrs.e50DragClass);
+            element.addClass(attrs.e50DragClass);
           }
-          angular.element('body').css({
-            userSelect: ''
-          }).off('mouseup mousemove');
+
+          // Create the dragging border element
+          $drag = angular.element('<div></div>').css({
+            position: 'absolute',
+            width: element[0].clientWidth,
+            height: element[0].clientHeight,
+            top: iTop,
+            left: iLeft,
+            zIndex: 10000000,
+            cursor: 'move'
+          }).addClass('e50-drag-overlay');
+          if ('e50DragOverlayClass' in attrs) {
+            $drag.addClass(attrs.e50DragOverlayClass);
+          }
+
+          // Add events for moving and stopping
+          angular.element('body').append($drag).css({
+            userSelect: 'none'
+
+          }).on('mousemove', function(event) {
+            // Determine where the thing is dragged
+            var cTop = 'e50DragX' in attrs ?
+              gravity(iTop, event.clientY - diffTop) : event.clientY - diffTop;
+            var cLeft = 'e50DragY' in attrs ?
+              gravity(iLeft, event.clientX - diffLeft) : event.clientX - diffLeft;
+            $drag.css({ top: cTop, left: cLeft });
+            // Determine where to drop it
+            moveRow(cTop, cLeft);
+
+          }).on('mouseup', function() {
+            $drag.remove();
+            element.removeClass('e50-dragging');
+            if ('e50DragClass' in attrs) {
+              element.removeClass(attrs.e50DragClass);
+            }
+            angular.element('body').css({
+              userSelect: ''
+            }).off('mouseup mousemove');
+          });
         });
       };
 

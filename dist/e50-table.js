@@ -516,10 +516,15 @@ angular.module('e50Table').directive('e50InfiniteScroll', ["$parse", function ($
 angular.module('e50Table').directive('e50NoProp', function () {
   return {
     restrict: 'A',
-    link: function postLink(scope, element, attrs) {
-      element.on('click', function(e) {
+    link: function postLink(scope, element) {
+
+      function stopProp(e) {
         e.stopPropagation();
-      });
+      }
+
+      element.on('click', stopProp);
+      element.on('mousedown', stopProp);
+
     }
   };
 });
@@ -538,12 +543,25 @@ angular.module('e50Table').directive('e50Table', ["$parse", function ($parse) {
       var attrValue = tAttrs.e50Table ? '=' + tAttrs.e50Table : '';
       var rows = tElement[0].querySelectorAll('[e50-table-row' + attrValue + ']');
       angular.forEach(rows, function(row) {
-        var rpt = document.createAttribute('ng-repeat');
+        // Add ng-repeat-start
+        var rpt = document.createAttribute('ng-repeat-start');
         var key = 'e50DataKey' in tAttrs ? tAttrs.e50DataKey : 't';
         var prop = 'e50DataProp' in tAttrs ? '.' + tAttrs.e50DataProp : '';
         rpt.value = key + ' in e50FilteredData = (e50GetData()' + prop +
             ' | orderBy : e50Sort : e50SortReverse | filter : e50Filter | limitTo : e50LimitTo)';
         row.attributes.setNamedItem(rpt);
+
+        // Add ng-repeat-end
+        var end = row;
+        var next = row;
+        do {
+          next = next.nextElementSibling;
+          if (next && next.hasAttribute('e50-table-row-end')) {
+            end = next;
+            break;
+          }
+        } while (next);
+        end.attributes.setNamedItem(document.createAttribute('ng-repeat-end'));
       });
 
       return function(scope, element, attrs) {

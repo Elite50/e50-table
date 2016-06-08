@@ -70,7 +70,11 @@ The Elite50 Table supports many different HTML attributes, allowing for a large 
 
 #### `e50-table-row` `e50-table-row="string"`
 
-**Required**. Placed on a *different* HTML element than `e50-table`. This element will be repeated for each value in the data set, creating multiple child scopes. Works very similarly to [ngRepeat](https://docs.angularjs.org/api/ng/directive/ngRepeat). If a value is provided, it will be sought only by `e50-table` elements with the same value (allowing for nesting of multiple tables).
+**Required**. Placed on a *different* HTML element than `e50-table`. This element will be repeated for each value in the data set, creating multiple child scopes. Works like [ngRepeat](https://docs.angularjs.org/api/ng/directive/ngRepeat). If a value is provided, it will be sought only by `e50-table` elements with the same value (allowing for nesting of multiple tables).
+
+#### `e50-table-row-end`
+
+Placed on a sibling element following the `e50-table-row` element. If provided, all elements starting with `e50-table-row` and ending with this element will be repeated for each row of the table. Works like `ng-repeat-start`/`ng-repeat-end`.
 
 #### `e50-data="expr:array|object"`
 
@@ -371,9 +375,9 @@ This is useful if you have a click event on an entire table row, but want to hav
 
 Note that dragging the rows will have no effect if `e50-sort` is applied to the table.
 
-#### `e50-drag-handle`
+#### `e50-drag-handle` `e50-drag-handle="expr:boolean"`
 
-**Requires `e50-drag`**. Placed on the same element as `e50-drag` or *any* child element. This attribute specifies the UI element that initializes the drag. When a user clicks and drags the element, row reordering begins.
+**Requires `e50-drag`**. Placed on the same element as `e50-drag` or *any* child element. This attribute specifies the UI element that initializes the drag. When a user clicks and drags the element, row reordering begins. If a value is provided, the drag controls will only be active when the value evaluates to `true`.
 
 #### `e50-drag-class="string"`
 

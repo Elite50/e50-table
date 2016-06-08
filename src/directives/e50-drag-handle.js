@@ -43,13 +43,11 @@ angular.module('e50Table').directive('e50DragHandle', function ($parse) {
         // If handle is dynamic
         scope.$watch(function() {
           return $parse(attrs.e50DragHandle)(scope);
-        }, function(v, vo) {
-          if (v !== vo) {
-            if (v) {
-              addHandle();
-            } else {
-              removeHandle();
-            }
+        }, function(v) {
+          if (v) {
+            addHandle();
+          } else {
+            removeHandle();
           }
         });
       }

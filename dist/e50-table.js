@@ -165,6 +165,7 @@ angular.module('e50Table').directive('e50Drag', ["$timeout", function ($timeout)
       }
 
       // Find the closest row location and drop the dragged item
+      var lastIndex = null;
       function moveRow(cTop, cLeft) {
         var closestDist = Number.MAX_VALUE;
         var closestIndex;
@@ -178,11 +179,16 @@ angular.module('e50Table').directive('e50Drag', ["$timeout", function ($timeout)
             closestIndex = r;
           }
         });
-        // Reorder the list and recalculate map
-        if (index !== closestIndex) {
-          scope.e50MoveData(index, closestIndex);
-          index = closestIndex;
-          rowMap = getRowMap();
+        // Ensure it's not going back to it's previous position prematurely
+        if (lastIndex === null || closestIndex !== lastIndex) {
+          lastIndex = null;
+          // Reorder the list and recalculate map
+          if (index !== closestIndex) {
+            scope.e50MoveData(index, closestIndex);
+            lastIndex = index;
+            index = closestIndex;
+            rowMap = getRowMap();
+          }
         }
       }
 

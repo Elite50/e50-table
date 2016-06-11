@@ -767,7 +767,7 @@ angular.module('e50Table').factory('E50Poll', ["$timeout", function($timeout) {
     this.delay = delay ? delay : 1000;
     this.callback = callback;
     this.canceled = false;
-    this.wait();
+    this.poll();
   }
 
   // Continually run the callback function

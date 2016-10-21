@@ -28,11 +28,13 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, E5
       }
 
       // Define the resource to fetch from
-      var fetchResource = $resource(attrs.e50Fetch, {}, {
-        fetch: {
-          method: 'e50FetchMethod' in attrs ? attrs.e50FetchMethod : 'GET'
-        }
-      });
+      function fetchResource() {
+        return $resource(attrs.e50Fetch, {}, {
+          fetch: {
+            method: 'e50FetchMethod' in attrs ? attrs.e50FetchMethod : 'GET'
+          }
+        });
+      }
 
       // Fetch the table data
       function fetch(isPoll, isScroll) {
@@ -66,7 +68,7 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, E5
           curFetchNum = fetchNum;
           scope.e50FetchCount++;
         }
-        var promise = fetchResource.fetch(params,body).$promise.then(
+        var promise = fetchResource().fetch(params,body).$promise.then(
           function(response) {
             // The params have been changed, don't use this request
             if (curFetchNum !== fetchNum) {
@@ -132,7 +134,9 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, E5
         scope.$watch(function() {
           return [
             $parse(attrs.e50FetchParams)(scope),
-            $parse(attrs.e50FetchBody)(scope)
+            $parse(attrs.e50FetchBody)(scope),
+            attrs.e50Fetch,
+            attrs.e50FetchMethod
           ];
         }, function() {
           // Don't fetch if sorting should be done client-side

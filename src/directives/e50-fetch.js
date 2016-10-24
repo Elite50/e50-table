@@ -138,9 +138,13 @@ angular.module('e50Table').directive('e50Fetch', function ($parse, $resource, E5
             attrs.e50Fetch,
             attrs.e50FetchMethod
           ];
-        }, function() {
-          // Don't fetch if sorting should be done client-side
+        }, function(newValues, oldValues) {
+          // Fetch only if we have done the initial fetch, or
+          // if the fetch url or method has changed, or
+          // if fetch parameters change and we are over the fetch limit
+          // (ie: if we are under limit, sorting/filtering should be done client side)
           if (!hasFetched ||
+              (newValues[2] !== oldValues[2] || newValues[3] !== newValues[3]) ||
               !('e50FetchLimit' in attrs && 'e50FetchLimitProp' in attrs &&
                 scope.e50GetData()[attrs.e50FetchLimitProp] <=
                 attrs.e50FetchLimit)) {

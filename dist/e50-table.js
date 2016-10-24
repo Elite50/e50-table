@@ -336,9 +336,13 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "E50Pol
             attrs.e50Fetch,
             attrs.e50FetchMethod
           ];
-        }, function() {
-          // Don't fetch if sorting should be done client-side
+        }, function(newValues, oldValues) {
+          // Fetch only if we have done the initial fetch, or
+          // if the fetch url or method has changed, or
+          // if fetch parameters change and we are over the fetch limit
+          // (ie: if we are under limit, sorting/filtering should be done client side)
           if (!hasFetched ||
+              (newValues[2] !== oldValues[2] || newValues[3] !== newValues[3]) ||
               !('e50FetchLimit' in attrs && 'e50FetchLimitProp' in attrs &&
                 scope.e50GetData()[attrs.e50FetchLimitProp] <=
                 attrs.e50FetchLimit)) {
@@ -400,13 +404,55 @@ angular.module('e50Table').directive('e50IfData', function () {
     restrict: 'A',
     require: '^e50Table',
     link: function (scope, element, attrs) {
-
       var show = attrs.e50IfData !== 'false';
-      var replace = attrs.e50IfNoData ? attrs.e50IfNoData : null;
-      var $none = angular.element('<div class="e50-no-data">'+replace+'</div>');
-      var loading = 'e50IfLoadingData' in attrs ?
-        (attrs.e50IfLoadingData.length ? attrs.e50IfLoadingData : 'Loading data') : null;
-      var $noneL = angular.element('<div class="e50-no-data">'+loading+'</div>');
+      var replace;
+      var $none;
+      var loading;
+      var $noneL;
+
+      /**
+       * Create or update the no-data element
+       */
+      function updateNoDataElement() {
+        replace = attrs.e50IfNoData ? attrs.e50IfNoData : null;
+
+        if ($none) {
+          $none.text(replace);
+        } else {
+          $none = angular.element('<div class="e50-no-data">' + replace + '</div>');
+        }
+      }
+
+      /**
+       * Create or update the loading-data element
+       */
+      function updateLoadingDataElement() {
+        loading = null;
+
+        if ('e50IfLoadingData' in attrs) {
+          loading = attrs.e50IfLoadingData.length ? attrs.e50IfLoadingData : 'Loading data';
+        }
+
+        if ($noneL) {
+          $noneL.text(loading);
+        } else {
+          $noneL = angular.element('<div class="e50-no-data">' + loading + '</div>');
+        }
+      }
+
+      // Create initial elements
+      updateNoDataElement();
+      updateLoadingDataElement();
+
+      // Watch for changes to the no-data attr and update element
+      scope.$watch(function() {
+        return attrs.e50IfNoData
+      }, updateNoDataElement);
+
+      // WAtch for changes to the loading-data attr and update element
+      scope.$watch(function() {
+        return attrs.e50IfLoadingData;
+      }, updateLoadingDataElement);
 
       // Hide & show the element based on data status
       scope.$watchCollection('e50FilteredData', function(data) {
@@ -446,7 +492,6 @@ angular.module('e50Table').directive('e50IfData', function () {
           }
         }
       });
-
     }
   };
 });

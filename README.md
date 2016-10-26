@@ -272,6 +272,12 @@ This feature is useful if you have data sets of varying sizes, and you want to f
 
 See `e50-fetch-limit-prop` for an example.
 
+#### `e50-fetch-limit-unless="expr:array"`
+
+**Requires `e50-fetch`, `e50-fetch-limit`, `e50-fetch-params`/`e50-fetch-body`**. If included, you can pass in an array of parameters (properties of either `e50-fetch-params` or `e50-fetch-body`) that will ignore `e50-fetch-limit`. In this situation, the table will always fetch from the server if any of the specified parameters have changed, regardless of the number of records in the table.
+
+See `e50-fetch-limit-prop` for an example.
+
 #### `e50-fetch-limit-prop="string"`
 
 **Requires `e50-fetch`, `e50-fetch-limit`**. Similar to `e50-data-prop`, represents an object property of the fetched data that should represent the total size of the data set.
@@ -303,13 +309,14 @@ The table is set up like:
 <table e50-table
        e50-data-prop="list"
        e50-fetch="/endpoint"
-       e50-fetch-params="{ orderBy: sort }"
+       e50-fetch-params="{ resource: type, orderBy: sort }"
        e50-sort="{{ sort }}"
        e50-fetch-limit="5"
-       e50-fetch-limit-prop="total">
+       e50-fetch-limit-prop="total"
+       e50-fetch-limit-unless="['resource']">
 ```
 
-In this situation, the data will only be fetched once if `data.total` <= 5. In that case, if the value of `$scope.sort` changes, it will simply adjust the sorting on the client-side. If `data.total` > 5, then the table will fetch as normal if `$scope.sort` changes.
+In this situation, the data will only be fetched once if `data.total` <= 5. In that case, if the value of `$scope.sort` changes, it will simply adjust the sorting on the client-side. If `data.total` > 5, then the table will fetch as normal if `$scope.sort` changes. However, because `e50-limit-unless` is set, the table will always re-fetch from the server if `$scope.type` changes.
 
 #### `e50-loading` `e50-loading="string"`
 

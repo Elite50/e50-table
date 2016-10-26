@@ -323,6 +323,25 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "E50Pol
         return promise;
       }
 
+      /**
+       * Determine if any of the given fetch params have changed
+       *
+       * @param {object} newParams
+       * @param {object} oldParams
+       * @param {array} params
+       *
+       * @return {bool}
+       */
+      function paramsHaveChanged(newParams, oldParams, params) {
+        var changed = false;
+        _.forEach(params, function(param) {
+          if (newParams && oldParams && !_.isEqual(newParams[param], oldParams[param])) {
+            changed = true;
+          }
+        });
+        return changed;
+      }
+
       // Only fetch once if desired
       if ('e50FetchOnce' in attrs) {
         fetch();
@@ -343,9 +362,17 @@ angular.module('e50Table').directive('e50Fetch', ["$parse", "$resource", "E50Pol
           // (ie: if we are under limit, sorting/filtering should be done client side)
           if (!hasFetched ||
               (newValues[2] !== oldValues[2] || newValues[3] !== newValues[3]) ||
-              !('e50FetchLimit' in attrs && 'e50FetchLimitProp' in attrs &&
-                scope.e50GetData()[attrs.e50FetchLimitProp] <=
-                attrs.e50FetchLimit)) {
+              !(
+                'e50FetchLimit' in attrs &&
+                'e50FetchLimitProp' in attrs &&
+                scope.e50GetData()[attrs.e50FetchLimitProp] <= attrs.e50FetchLimit &&
+                !(
+                  'e50FetchLimitUnless' in attrs &&
+                  (paramsHaveChanged(newValues[0], oldValues[0], $parse(attrs.e50FetchLimitUnless)(scope)) ||
+                   paramsHaveChanged(newValues[1], oldValues[1], $parse(attrs.e50FetchLimitUnless)(scope)))
+                )
+              )
+          ) {
             fetch();
           }
         }, true);

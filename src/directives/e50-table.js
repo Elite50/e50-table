@@ -46,12 +46,34 @@ angular.module('e50Table').directive('e50Table', function ($parse) {
         }
 
         // Create filtering function
-        scope.e50Filter = function(d) {
+        scope.e50Filter = function(d, index, array) {
           if (d && 'id' in d && deleted.indexOf(d.id) >= 0) { return false; }
+
+          var display = true;
+
+          // Apply filtering
           if ('e50Filter' in attrs) {
-            return $parse(attrs.e50Filter)(scope)(d);
+            display = $parse(attrs.e50Filter)(scope)(d);
           }
-          return true;
+
+          // Filter out duplicates
+          if ('e50Deduplicate' in attrs) {
+            var dedupeFn;
+            if (attrs.e50Deduplicate) {
+              dedupeFn = $parse(attrs.e50Deduplicate)(scope);
+            } else {
+              dedupeFn = function(a, b) {
+                return angular.equals(a, b);
+              };
+            }
+            for (var i = 0; i < index; i++) {
+              if (dedupeFn(d, array[i])) {
+                display = false;
+              }
+            }
+          }
+
+          return display;
         };
 
         // Create delete row function

@@ -248,6 +248,45 @@ $scope.data = ['Will', 'James', 'John', 'George'];
 |Will|
 |John|
 
+#### `e50-deduplicate` `e50-deduplicate="expr:function"`
+
+If set, the table will filter out duplicate rows. If no expression is provided, the table will check for duplicates using `angular.equals()`. If a function expression is provided, the function will be called with two rows as parameters, and should return `true` if the rows are duplicates, and `false` otherwise.
+
+##### Example:
+
+```javascript
+$scope.isDuplicate = function(a, b) {
+   return a.id === b.id;
+};
+$scope.data = [
+  { id: 1, name: 'Will' },
+  { id: 2, name: 'John' },
+  { id: 1, name: 'William' }
+];
+```
+
+```html
+<table e50-table e50-data="data" e50-deduplicate="isDuplicate">
+  <thead>
+    <tr>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>{{ t.name }}</td>
+    </tr>
+  </tbody>
+</table>
+```
+
+##### Result:
+
+|Name|
+|----|
+|Will|
+|John|
+
 #### `e50-limit-to="expr:integer"`
 
 If provided, the table will be only display the first `integer` rows of the dataset.

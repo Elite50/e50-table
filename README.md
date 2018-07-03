@@ -407,7 +407,7 @@ Placed on *any* HTML element within the directive. If provided, hovering over th
 
 #### `e50-hover-if="expr:boolean"`
 
-**Requires `e50-hover-if`**. Placed on the same element as `e50-hover`. If provided, the hover effect is only enabled when its value evaluates to `true`.
+**Requires `e50-hover`**. Placed on the same element as `e50-hover`. If provided, the hover effect is only enabled when its value evaluates to `true`.
 
 #### `e50-no-prop`
 

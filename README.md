@@ -128,7 +128,7 @@ If provided, the table will make an AJAX request to the specified url `string` a
 
 The `string` can be parameterized using `:param` syntax, as in [ngResource](https://docs.angularjs.org/api/ngResource). These paremeters will be populated by the `e50-fetch-params` attribute.
 
-If `e50-data` is set, the result of the fetch will replace the parent scope variable defined by the `e50-data` attributed.
+If `e50-data` is set, the result of the fetch will replace the parent scope variable defined by the `e50-data` attribute.
 
 By default, the directive will make a `GET` request with no parameters. This, and other behaviors, can be modified with other attributes.
 
